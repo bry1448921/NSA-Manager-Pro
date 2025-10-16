@@ -7,7 +7,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import ClientsPage from "./pages/ClientsPage";
-import NotarizationsPage from "./pages/NotarizationsPage"; // Import the new NotarizationsPage
+import NotarizationsPage from "./pages/NotarizationsPage";
+import ProfilePage from "./pages/ProfilePage"; // Import the new ProfilePage
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 
@@ -58,10 +59,18 @@ const App = () => (
               }
             />
             <Route
-              path="/notarizations" // New route for notarizations
+              path="/notarizations"
               element={
                 <ProtectedRoute>
                   <NotarizationsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile" // New route for the profile page
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
                 </ProtectedRoute>
               }
             />
