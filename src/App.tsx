@@ -8,7 +8,8 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import ClientsPage from "./pages/ClientsPage";
 import NotarizationsPage from "./pages/NotarizationsPage";
-import ProfilePage from "./pages/ProfilePage"; // Import the new ProfilePage
+import ProfilePage from "./pages/ProfilePage";
+import OrdersPage from "./pages/OrdersPage"; // Import the new OrdersPage
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 
@@ -67,10 +68,18 @@ const App = () => (
               }
             />
             <Route
-              path="/profile" // New route for the profile page
+              path="/profile"
               element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders" // New route for the orders page
+              element={
+                <ProtectedRoute>
+                  <OrdersPage />
                 </ProtectedRoute>
               }
             />

@@ -30,6 +30,9 @@ const Index = () => {
             <Link to="/notarizations">Manage Notarizations</Link>
           </Button>
           <Button asChild>
+            <Link to="/orders">Manage Orders</Link>
+          </Button>
+          <Button asChild>
             <Link to="/profile">Manage Profile</Link>
           </Button>
           <Button onClick={handleLogout} variant="destructive">
