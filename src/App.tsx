@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import ClientsPage from "./pages/ClientsPage"; // Import the new ClientsPage
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 
@@ -44,6 +45,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Index />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/clients" // New route for clients
+              element={
+                <ProtectedRoute>
+                  <ClientsPage />
                 </ProtectedRoute>
               }
             />

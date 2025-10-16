@@ -2,7 +2,7 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useSession } from "@/contexts/SessionContext";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Import Link
 
 const Index = () => {
   const { user } = useSession();
@@ -22,9 +22,14 @@ const Index = () => {
         <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
           This is your Notary Office Manager dashboard.
         </p>
-        <Button onClick={handleLogout} variant="destructive">
-          Logout
-        </Button>
+        <div className="flex flex-col space-y-4">
+          <Button asChild>
+            <Link to="/clients">Manage Clients</Link>
+          </Button>
+          <Button onClick={handleLogout} variant="destructive">
+            Logout
+          </Button>
+        </div>
       </div>
       <MadeWithDyad />
     </div>
