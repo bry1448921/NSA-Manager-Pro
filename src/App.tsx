@@ -9,7 +9,8 @@ import Login from "./pages/Login";
 import ClientsPage from "./pages/ClientsPage";
 import NotarizationsPage from "./pages/NotarizationsPage";
 import ProfilePage from "./pages/ProfilePage";
-import OrdersPage from "./pages/OrdersPage"; // Import the new OrdersPage
+import OrdersPage from "./pages/OrdersPage";
+import Layout from "./components/Layout"; // Import the new Layout component
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 
@@ -43,46 +44,20 @@ const App = () => (
         <SessionContextProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
+            {/* Protected routes nested under the Layout component */}
             <Route
-              path="/"
               element={
                 <ProtectedRoute>
-                  <Index />
+                  <Layout />
                 </ProtectedRoute>
               }
-            />
-            <Route
-              path="/clients"
-              element={
-                <ProtectedRoute>
-                  <ClientsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/notarizations"
-              element={
-                <ProtectedRoute>
-                  <NotarizationsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/orders" // New route for the orders page
-              element={
-                <ProtectedRoute>
-                  <OrdersPage />
-                </ProtectedRoute>
-              }
-            />
+            >
+              <Route path="/" element={<Index />} />
+              <Route path="/clients" element={<ClientsPage />} />
+              <Route path="/notarizations" element={<NotarizationsPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/orders" element={<OrdersPage />} />
+            </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

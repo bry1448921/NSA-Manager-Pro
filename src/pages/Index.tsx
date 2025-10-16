@@ -53,14 +53,12 @@ const Index = () => {
     fetchCounts();
   }, [fetchCounts]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/login');
-  };
+  // Logout button is now in the sidebar, so no need for a separate handler here.
+  // The sidebar will handle the logout action.
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md mt-8">
+    <div className="flex flex-col items-center p-4">
+      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
         <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white text-center">
           Welcome, {user?.email}!
         </h1>
@@ -112,26 +110,9 @@ const Index = () => {
             </CardContent>
           </Card>
         </div>
-
-        <div className="flex flex-col space-y-4">
-          <Button asChild>
-            <Link to="/clients">Manage Clients</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/notarizations">Manage Notarizations</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/orders">Manage Orders</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/profile">Manage Profile</Link>
-          </Button>
-          <Button onClick={handleLogout} variant="destructive">
-            Logout
-          </Button>
-        </div>
+        {/* Navigation buttons removed, now handled by sidebar */}
       </div>
-      <MadeWithDyad />
+      {/* MadeWithDyad is now in the sidebar */}
     </div>
   );
 };
