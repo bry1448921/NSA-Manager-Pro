@@ -2,7 +2,7 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useSession } from "@/contexts/SessionContext";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, Link } from "react-router-dom"; // Import Link
+import { useNavigate, Link } from "react-router-dom";
 
 const Index = () => {
   const { user } = useSession();
@@ -25,6 +25,9 @@ const Index = () => {
         <div className="flex flex-col space-y-4">
           <Button asChild>
             <Link to="/clients">Manage Clients</Link>
+          </Button>
+          <Button asChild>
+            <Link to="/notarizations">Manage Notarizations</Link>
           </Button>
           <Button onClick={handleLogout} variant="destructive">
             Logout
