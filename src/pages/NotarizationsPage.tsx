@@ -22,7 +22,6 @@ import { supabase } from '@/integrations/supabase/client';
 import NotarizationForm from '@/components/NotarizationForm';
 import { showSuccess, showError } from '@/utils/toast';
 import { PencilIcon, Trash2Icon, PlusCircleIcon } from 'lucide-react';
-import { MadeWithDyad } from '@/components/made-with-dyad';
 import { format } from 'date-fns';
 
 interface Notarization {
@@ -186,7 +185,6 @@ const NotarizationsPage: React.FC = () => {
           </div>
         )}
       </div>
-      <MadeWithDyad />
     </div>
   );
 };

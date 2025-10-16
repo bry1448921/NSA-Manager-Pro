@@ -1,15 +1,12 @@
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useSession } from "@/contexts/SessionContext";
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UsersIcon, FileTextIcon, PackageIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client"; // Keep for fetching counts
 
 const Index = () => {
   const { user } = useSession();
-  const navigate = useNavigate();
   const [clientCount, setClientCount] = useState<number | null>(null);
   const [notarizationCount, setNotarizationCount] = useState<number | null>(null);
   const [orderCount, setOrderCount] = useState<number | null>(null);
@@ -52,9 +49,6 @@ const Index = () => {
   useEffect(() => {
     fetchCounts();
   }, [fetchCounts]);
-
-  // Logout button is now in the sidebar, so no need for a separate handler here.
-  // The sidebar will handle the logout action.
 
   return (
     <div className="flex flex-col items-center p-4">
@@ -110,9 +104,7 @@ const Index = () => {
             </CardContent>
           </Card>
         </div>
-        {/* Navigation buttons removed, now handled by sidebar */}
       </div>
-      {/* MadeWithDyad is now in the sidebar */}
     </div>
   );
 };

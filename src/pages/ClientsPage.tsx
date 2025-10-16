@@ -22,7 +22,6 @@ import { supabase } from '@/integrations/supabase/client';
 import ClientForm from '@/components/ClientForm';
 import { showSuccess, showError } from '@/utils/toast';
 import { PencilIcon, Trash2Icon, PlusCircleIcon } from 'lucide-react';
-import { MadeWithDyad } from '@/components/made-with-dyad';
 import { Link } from 'react-router-dom';
 
 interface Client {
@@ -172,7 +171,6 @@ const ClientsPage: React.FC = () => {
           </div>
         )}
       </div>
-      <MadeWithDyad />
     </div>
   );
 };

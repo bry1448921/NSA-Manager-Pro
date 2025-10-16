@@ -6,7 +6,6 @@ import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '@/contexts/SessionContext';
-import { MadeWithDyad } from '@/components/made-with-dyad';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -50,7 +49,6 @@ const Login: React.FC = () => {
           redirectTo={window.location.origin + '/'}
         />
       </div>
-      <MadeWithDyad />
     </div>
   );
 };

@@ -22,7 +22,6 @@ import { supabase } from '@/integrations/supabase/client';
 import OrderForm from '@/components/OrderForm';
 import { showSuccess, showError } from '@/utils/toast';
 import { PencilIcon, Trash2Icon, PlusCircleIcon } from 'lucide-react';
-import { MadeWithDyad } from '@/components/made-with-dyad';
 import { format } from 'date-fns';
 
 interface Order {
@@ -190,7 +189,6 @@ const OrdersPage: React.FC = () => {
           </div>
         )}
       </div>
-      <MadeWithDyad />
     </div>
   );
 };

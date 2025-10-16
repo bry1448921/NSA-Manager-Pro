@@ -2,7 +2,6 @@
 
 import React from 'react';
 import ProfileForm from '@/components/ProfileForm';
-import { MadeWithDyad } from '@/components/made-with-dyad';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon } from 'lucide-react';
@@ -21,7 +20,6 @@ const ProfilePage: React.FC = () => {
         </div>
         <ProfileForm />
       </div>
-      <MadeWithDyad />
     </div>
   );
 };
