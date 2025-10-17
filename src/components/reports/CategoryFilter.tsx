@@ -41,13 +41,13 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ selectedCategory, onSel
       <Label htmlFor={`${type}-category-filter`}>Filter by {type === 'income' ? 'Income' : 'Expense'} Category</Label>
       <Select
         value={selectedCategory || ''}
-        onValueChange={(value) => onSelectCategory(value === '' ? undefined : value)}
+        onValueChange={(value) => onSelectCategory(value === 'all' ? undefined : value)}
       >
         <SelectTrigger id={`${type}-category-filter`} className="w-[200px]">
           <SelectValue placeholder="All Categories" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All Categories</SelectItem>
+          <SelectItem value="all">All Categories</SelectItem>
           {categories.map((category) => (
             <SelectItem key={category.value} value={category.value}>
               {category.label}

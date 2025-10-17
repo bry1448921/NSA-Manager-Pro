@@ -162,14 +162,14 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ onSuccess, initialData }) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Bank Account (Optional)</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value || ''}>
+              <Select onValueChange={(value) => field.onChange(value === 'none' ? '' : value)} defaultValue={field.value || ''}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a bank account" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {bankAccounts.map((account) => (
                     <SelectItem key={account.id} value={account.id}>
                       {account.account_name} ({account.bank_name})

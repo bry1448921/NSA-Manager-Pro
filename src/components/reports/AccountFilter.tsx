@@ -55,14 +55,14 @@ const AccountFilter: React.FC<AccountFilterProps> = ({ selectedAccountId, onSele
       <Label htmlFor="account-filter">Filter by Account</Label>
       <Select
         value={selectedAccountId || ''}
-        onValueChange={(value) => onSelectAccount(value === '' ? undefined : value)}
+        onValueChange={(value) => onSelectAccount(value === 'all' ? undefined : value)}
         disabled={loading}
       >
         <SelectTrigger id="account-filter" className="w-[200px]">
           <SelectValue placeholder="All Accounts" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All Accounts</SelectItem>
+          <SelectItem value="all">All Accounts</SelectItem>
           {bankAccounts.map((account) => (
             <SelectItem key={account.id} value={account.id}>
               {account.account_name} ({account.bank_name})
