@@ -21,8 +21,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserIcon } from 'lucide-react';
 
 const profileFormSchema = z.object({
-  first_name: z.string().min(1, { message: 'First name is required.' }).optional().or(z.literal('')),
-  last_name: z.string().min(1, { message: 'Last name is required.' }).optional().or(z.literal('')),
+  first_name: z.string().optional().or(z.literal('')), // Made truly optional
+  last_name: z.string().optional().or(z.literal('')),  // Made truly optional
   avatar_url: z.string().url({ message: 'Invalid URL.' }).optional().or(z.literal('')),
 });
 
@@ -100,7 +100,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
   };
 
   if (loading) {
-    return <p className="text-center text-gray-600 dark:text-gray-400">Loading profile...</p>;
+    return (
+      <p className="text-center text-gray-600 dark:text-gray-400">Loading profile...</p>
+    );
   }
 
   return (
