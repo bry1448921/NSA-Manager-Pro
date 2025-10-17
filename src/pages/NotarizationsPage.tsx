@@ -23,6 +23,7 @@ import NotarizationForm from '@/components/NotarizationForm';
 import { showSuccess, showError } from '@/utils/toast';
 import { PencilIcon, Trash2Icon, PlusCircleIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Notarization {
   id: string;
@@ -119,9 +120,45 @@ const NotarizationsPage: React.FC = () => {
     );
   }
 
+  // Summary metrics
+  const now = new Date();
+  const isMTD = (d: Date) => d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  const isYTD = (d: Date) => d.getFullYear() === now.getFullYear();
+  const mtd = notarizations.filter(n => isMTD(new Date(n.notarization_date))).length;
+  const ytd = notarizations.filter(n => isYTD(new Date(n.notarization_date))).length;
+  const active = notarizations.filter(n => n.status !== 'completed' && n.status !== 'cancelled').length;
+  const completed = notarizations.filter(n => n.status === 'completed').length;
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
       <div className="w-full max-w-4xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Card className="bg-rose-600 text-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Notarizations MTD</CardTitle>
+            </CardHeader>
+            <CardContent className="text-2xl font-bold">{mtd}</CardContent>
+          </Card>
+          <Card className="bg-orange-600 text-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Notarizations YTD</CardTitle>
+            </CardHeader>
+            <CardContent className="text-2xl font-bold">{ytd}</CardContent>
+          </Card>
+          <Card className="bg-amber-600 text-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Active</CardTitle>
+            </CardHeader>
+            <CardContent className="text-2xl font-bold">{active}</CardContent>
+          </Card>
+          <Card className="bg-emerald-600 text-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Completed</CardTitle>
+            </CardHeader>
+            <CardContent className="text-2xl font-bold">{completed}</CardContent>
+          </Card>
+        </div>
+
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Notarizations</h1>
           <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>

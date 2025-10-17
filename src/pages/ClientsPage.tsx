@@ -23,6 +23,7 @@ import ClientForm from '@/components/ClientForm';
 import { showSuccess, showError } from '@/utils/toast';
 import { PencilIcon, Trash2Icon, PlusCircleIcon, EyeIcon } from 'lucide-react'; // Added EyeIcon
 import { Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Client {
   id: string;
@@ -39,6 +40,8 @@ const ClientsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | undefined>(undefined);
+  // NEW: active client ids via orders
+  const [activeClientIds, setActiveClientIds] = useState<Set<string>>(new Set());
 
   const fetchClients = useCallback(async () => {
     if (!user) return;
@@ -61,6 +64,22 @@ const ClientsPage: React.FC = () => {
   useEffect(() => {
     fetchClients();
   }, [fetchClients]);
+
+  // NEW: fetch active client ids from orders
+  const fetchActiveClients = useCallback(async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('orders')
+      .select('client_id')
+      .eq('user_id', user.id);
+    if (!error && data) {
+      setActiveClientIds(new Set((data as any[]).map(r => r.client_id)));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchActiveClients();
+  }, [fetchActiveClients]);
 
   const handleFormSuccess = () => {
     setIsFormOpen(false);
@@ -104,9 +123,43 @@ const ClientsPage: React.FC = () => {
     );
   }
 
+  // NEW: summary metrics
+  const totalClients = clients.length;
+  const newClients = clients.filter(c => {
+    const created = c as any;
+    const d = created.created_at ? new Date(created.created_at) : null;
+    if (!d) return false;
+    const now = new Date();
+    const diff = (now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24);
+    return diff <= 30;
+  }).length;
+  const activeClients = clients.filter(c => activeClientIds.has(c.id)).length;
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
       <div className="w-full max-w-4xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md mt-8">
+        {/* NEW: colorful summary cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <Card className="bg-cyan-600 text-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Total Clients</CardTitle>
+            </CardHeader>
+            <CardContent className="text-2xl font-bold">{totalClients}</CardContent>
+          </Card>
+          <Card className="bg-fuchsia-600 text-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">New (30 days)</CardTitle>
+            </CardHeader>
+            <CardContent className="text-2xl font-bold">{newClients}</CardContent>
+          </Card>
+          <Card className="bg-emerald-600 text-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Active Clients</CardTitle>
+            </CardHeader>
+            <CardContent className="text-2xl font-bold">{activeClients}</CardContent>
+          </Card>
+        </div>
+
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Clients</h1>
           <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
