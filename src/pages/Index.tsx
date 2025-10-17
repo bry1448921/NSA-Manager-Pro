@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UsersIcon, FileTextIcon, PackageIcon, DollarSignIcon, TrendingUpIcon, TrendingDownIcon, CreditCardIcon } from "lucide-react"; // Added CreditCardIcon
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/use-subscription"; // Import the useSubscription hook
+import FinancialSummary from "@/components/dashboard/FinancialSummary"; // New import
 
 const Index = () => {
   const { user } = useSession();
@@ -197,6 +198,11 @@ const Index = () => {
             </CardContent>
           </Card>
         </div>
+
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+          Financial Breakdown
+        </h2>
+        <FinancialSummary /> {/* New Financial Summary Component */}
       </div>
     </div>
   );
