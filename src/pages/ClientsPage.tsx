@@ -21,7 +21,7 @@ import { useSession } from '@/contexts/SessionContext';
 import { supabase } from '@/integrations/supabase/client';
 import ClientForm from '@/components/ClientForm';
 import { showSuccess, showError } from '@/utils/toast';
-import { PencilIcon, Trash2Icon, PlusCircleIcon } from 'lucide-react';
+import { PencilIcon, Trash2Icon, PlusCircleIcon, EyeIcon } from 'lucide-react'; // Added EyeIcon
 import { Link } from 'react-router-dom';
 
 interface Client {
@@ -155,6 +155,16 @@ const ClientsPage: React.FC = () => {
                         className="mr-2"
                       >
                         <PencilIcon className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        asChild
+                        className="mr-2"
+                      >
+                        <Link to={`/clients/${client.id}`}>
+                          <EyeIcon className="h-4 w-4" />
+                        </Link>
                       </Button>
                       <Button
                         variant="destructive"

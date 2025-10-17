@@ -15,10 +15,11 @@ import ExpensesPage from "./pages/ExpensesPage";
 import NotaryCredentialsPage from "./pages/NotaryCredentialsPage";
 import PricingPage from "./pages/PricingPage";
 import ManageSubscriptionPage from "./pages/ManageSubscriptionPage";
-import ReportsPage from "./pages/ReportsPage"; // New import
+import ReportsPage from "./pages/ReportsPage";
 import Layout from "./components/Layout";
 import LandingPage from "./pages/LandingPage";
 import RegisterPage from "./pages/RegisterPage";
+import ClientDetailsPage from "./pages/ClientDetailsPage"; // New import
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 
@@ -63,6 +64,7 @@ const App = () => (
             >
               <Route path="/dashboard" element={<Index />} />
               <Route path="/clients" element={<ClientsPage />} />
+              <Route path="/clients/:clientId" element={<ClientDetailsPage />} /> {/* New Client Details Route */}
               <Route path="/notarizations" element={<NotarizationsPage />} />
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/bank-accounts" element={<BankAccountsPage />} />
@@ -71,7 +73,7 @@ const App = () => (
               <Route path="/notary-credentials" element={<NotaryCredentialsPage />} />
               <Route path="/manage-subscription" element={<ManageSubscriptionPage />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/reports" element={<ReportsPage />} /> {/* New Reports Route */}
+              <Route path="/reports" element={<ReportsPage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
