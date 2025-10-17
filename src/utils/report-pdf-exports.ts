@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import html2canvas from 'html22canvas';
+import html2canvas from 'html2canvas';
 
 export const exportToPdf = async (elementId: string, filename: string) => {
   const input = document.getElementById(elementId);
