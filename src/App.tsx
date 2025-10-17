@@ -28,14 +28,16 @@ import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
+import { useSubscription } from "./hooks/use-subscription";
 
 const queryClient = new QueryClient();
 
 // ProtectedRoute component to guard routes
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { session, isLoading } = useSession();
+  const { subscription, isLoading: isSubLoading } = useSubscription();
 
-  if (isLoading) {
+  if (isLoading || isSubLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <p className="text-lg text-gray-700 dark:text-gray-300">Loading application...</p>
@@ -45,6 +47,11 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   if (!session) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Must have an active subscription (status not canceled/none)
+  if (!subscription || (subscription.status && ["canceled", "unpaid", "incomplete_expired"].includes(subscription.status))) {
+    return <Navigate to="/pricing" replace />;
   }
 
   return <>{children}</>;
