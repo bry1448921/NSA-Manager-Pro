@@ -2,11 +2,13 @@ import { useSession } from "@/contexts/SessionContext";
 import { Link } from "react-router-dom";
 import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UsersIcon, FileTextIcon, PackageIcon, DollarSignIcon, TrendingUpIcon, TrendingDownIcon } from "lucide-react"; // Added new icons
+import { UsersIcon, FileTextIcon, PackageIcon, DollarSignIcon, TrendingUpIcon, TrendingDownIcon, CreditCardIcon } from "lucide-react"; // Added CreditCardIcon
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/use-subscription"; // Import the useSubscription hook
 
 const Index = () => {
   const { user } = useSession();
+  const { subscription, isLoading: isSubscriptionLoading } = useSubscription(); // Use the subscription hook
   const [clientCount, setClientCount] = useState<number | null>(null);
   const [notarizationCount, setNotarizationCount] = useState<number | null>(null);
   const [orderCount, setOrderCount] = useState<number | null>(null);
@@ -88,6 +90,28 @@ const Index = () => {
         </p>
 
         <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Subscription Status</CardTitle>
+              <CreditCardIcon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isSubscriptionLoading ? 'Loading...' : subscription ? subscription.status.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) : 'None'}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {subscription ? (
+                  <Link to="/manage-subscription" className="text-blue-500 hover:underline">
+                    Manage Subscription
+                  </Link>
+                ) : (
+                  <Link to="/pricing" className="text-blue-500 hover:underline">
+                    View Pricing
+                  </Link>
+                )}
+              </p>
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
