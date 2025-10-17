@@ -21,8 +21,9 @@ import LandingPage from "./pages/LandingPage";
 import RegisterPage from "./pages/RegisterPage";
 import ClientDetailsPage from "./pages/ClientDetailsPage";
 import UserManagementPage from "./pages/UserManagementPage";
-import AdminDashboardPage from "./pages/AdminDashboardPage";
-import AdminSalesReportsPage from "./pages/AdminSalesReportsPage"; // New import
+import AdminDashboardPage from "./pages/AdminDashboardPage"; // This will now be Admin User Management
+import AdminSalesReportsPage from "./pages/AdminSalesReportsPage";
+import AdminOverviewPage from "./pages/AdminOverviewPage"; // New import
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
@@ -80,7 +81,15 @@ const App = () => (
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/user-management" element={<UserManagementPage />} />
               <Route
-                path="/admin-dashboard"
+                path="/admin-overview" // New Admin Overview Route
+                element={
+                  <AdminProtectedRoute>
+                    <AdminOverviewPage />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin-dashboard" // Existing Admin Dashboard, now Admin User Management
                 element={
                   <AdminProtectedRoute>
                     <AdminDashboardPage />
@@ -94,7 +103,7 @@ const App = () => (
                     <AdminSalesReportsPage />
                   </AdminProtectedRoute>
                 }
-              /> {/* New Admin Sales Reports Route */}
+              />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

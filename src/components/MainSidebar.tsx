@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { MenuIcon, UsersIcon, FileTextIcon, LayoutDashboardIcon, UserIcon, LogOutIcon, BanknoteIcon, DollarSignIcon, ReceiptTextIcon, StampIcon, CreditCardIcon, BarChart3Icon, UserPlusIcon, ShieldCheckIcon, LineChartIcon } from 'lucide-react'; // Added LineChartIcon for Admin Sales Reports
+import { MenuIcon, UsersIcon, FileTextIcon, LayoutDashboardIcon, UserIcon, LogOutIcon, BanknoteIcon, DollarSignIcon, ReceiptTextIcon, StampIcon, CreditCardIcon, BarChart3Icon, UserPlusIcon, ShieldCheckIcon, LineChartIcon, MonitorIcon } from 'lucide-react'; // Added MonitorIcon for Admin Overview
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSession } from '@/contexts/SessionContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -60,8 +60,9 @@ const MainSidebar: React.FC = () => {
         <NavLink to="/user-management" icon={<UserPlusIcon className="h-5 w-5" />} label="User Management" onClick={closeSheet} />
         {profile?.role === 'admin' && (
           <>
-            <NavLink to="/admin-dashboard" icon={<ShieldCheckIcon className="h-5 w-5" />} label="Admin Dashboard" onClick={closeSheet} />
-            <NavLink to="/admin-sales-reports" icon={<LineChartIcon className="h-5 w-5" />} label="Admin Sales Reports" onClick={closeSheet} /> {/* New Admin Sales Reports Link */}
+            <NavLink to="/admin-overview" icon={<MonitorIcon className="h-5 w-5" />} label="Admin Overview" onClick={closeSheet} /> {/* New Admin Overview Link */}
+            <NavLink to="/admin-dashboard" icon={<ShieldCheckIcon className="h-5 w-5" />} label="Admin User Management" onClick={closeSheet} /> {/* Renamed Admin Dashboard Link */}
+            <NavLink to="/admin-sales-reports" icon={<LineChartIcon className="h-5 w-5" />} label="Admin Sales Reports" onClick={closeSheet} />
           </>
         )}
         <NavLink to="/pricing" icon={<CreditCardIcon className="h-5 w-5" />} label="Pricing" onClick={closeSheet} />
