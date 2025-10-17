@@ -23,39 +23,64 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useSession } from '@/contexts/SessionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
-import { UserPlusIcon, Loader2Icon, UsersIcon } from 'lucide-react';
+import { UserCogIcon, Loader2Icon, UsersIcon } from 'lucide-react';
 
-const inviteUserSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address.' }),
+const PRIVILEGE_OPTIONS = [
+  'orders',
+  'notarizations',
+  'reports',
+  'credentials',
+  'income',
+  'expenses',
+  'clients',
+  'vendors',
+  'employees',
+];
+
+const createSubUserSchema = z.object({
+  email: z.string().email({ message: 'Valid email is required (for login).' }),
   first_name: z.string().min(1, { message: 'First name is required.' }),
   last_name: z.string().min(1, { message: 'Last name is required.' }),
+  job_role: z.string().min(1, { message: 'Job role is required.' }),
+  supervisor: z.string().min(1, { message: 'Supervisor is required.' }),
+  privileges: z.array(z.string()).min(1, { message: 'Select at least one privilege.' }),
 });
 
-type InviteUserFormValues = z.infer<typeof inviteUserSchema>;
+type CreateSubUserFormValues = z.infer<typeof createSubUserSchema>;
 
 interface SubUser {
   id: string;
   first_name: string | null;
   last_name: string | null;
   email: string;
+  job_role: string | null;
+  supervisor: string | null;
+  privileges: string[];
+  role: 'owner' | 'sub_user' | 'admin';
+  is_active: boolean;
   created_at: string;
 }
 
 const UserManagementPage: React.FC = () => {
-  const { user: currentUser, isLoading: isSessionLoading } = useSession();
+  const { user: currentUser, profile: currentProfile, isLoading: isSessionLoading } = useSession();
   const [subUsers, setSubUsers] = useState<SubUser[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
-  const [isInviting, setIsInviting] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
-  const form = useForm<InviteUserFormValues>({
-    resolver: zodResolver(inviteUserSchema),
+  const form = useForm<CreateSubUserFormValues>({
+    resolver: zodResolver(createSubUserSchema),
     defaultValues: {
       email: '',
       first_name: '',
       last_name: '',
+      job_role: '',
+      supervisor: '',
+      privileges: [],
     },
   });
 
@@ -63,38 +88,41 @@ const UserManagementPage: React.FC = () => {
     if (!currentUser) return;
     setLoadingUsers(true);
     try {
-      // Fetch profiles of users where owner_id is the current user's ID
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, created_at')
+        .select('id, first_name, last_name, job_role, supervisor, privileges, role, is_active, created_at')
         .eq('owner_id', currentUser.id);
 
       if (profilesError) throw profilesError;
 
-      // Fetch user emails from auth.users for these profiles
-      const userIds = profilesData.map(p => p.id);
+      const userIds = (profilesData || []).map(p => p.id);
       const { data: authUsersData, error: authUsersError } = await supabase
-        .from('users') // Accessing auth.users via public.users view if available, or direct admin call
+        .from('users')
         .select('id, email')
         .in('id', userIds);
 
       if (authUsersError) throw authUsersError;
 
-      const usersWithEmails = profilesData.map(profile => {
-        const authUser = authUsersData.find(au => au.id === profile.id);
+      const usersWithDetails = (profilesData || []).map(profile => {
+        const authUser = authUsersData?.find(au => au.id === profile.id);
         return {
           id: profile.id,
           first_name: profile.first_name,
           last_name: profile.last_name,
-          email: authUser?.email || 'N/A', // Fallback if email not found
-          created_at: profile.created_at,
-        };
+          email: authUser?.email || 'N/A',
+          job_role: (profile as any).job_role ?? null,
+          supervisor: (profile as any).supervisor ?? null,
+          privileges: Array.isArray((profile as any).privileges) ? (profile as any).privileges : [],
+          role: (profile as any).role,
+          is_active: (profile as any).is_active,
+          created_at: (profile as any).created_at,
+        } as SubUser;
       });
 
-      setSubUsers(usersWithEmails);
+      setSubUsers(usersWithDetails);
     } catch (error: any) {
       console.error('Error fetching sub-users:', error.message);
-      showError('Failed to load sub-users.');
+      showError('Failed to load authorized users.');
     } finally {
       setLoadingUsers(false);
     }
@@ -106,32 +134,39 @@ const UserManagementPage: React.FC = () => {
     }
   }, [currentUser, isSessionLoading, fetchSubUsers]);
 
-  const onInviteSubmit = async (values: InviteUserFormValues) => {
+  const onCreateSubUser = async (values: CreateSubUserFormValues) => {
     if (!currentUser) {
-      showError('You must be logged in to invite users.');
+      showError('You must be logged in to create users.');
       return;
     }
-
-    setIsInviting(true);
+    setIsCreating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('invite-user', {
+      const { data, error } = await supabase.functions.invoke('create-sub-user', {
         body: {
           email: values.email,
           first_name: values.first_name,
           last_name: values.last_name,
+          job_role: values.job_role,
+          supervisor: values.supervisor,
+          privileges: values.privileges,
         },
       });
 
       if (error) throw error;
 
-      showSuccess('Invitation sent successfully! The user will receive an email to set up their account.');
+      const tempPwd = (data as any)?.temp_password;
+      showSuccess(
+        tempPwd
+          ? `User created. Share the temporary password with them: ${tempPwd}`
+          : 'User created successfully.'
+      );
       form.reset();
-      fetchSubUsers(); // Refresh the list of sub-users
+      fetchSubUsers();
     } catch (error: any) {
-      console.error('Error inviting user:', error.message);
-      showError(`Failed to send invitation: ${error.message}`);
+      console.error('Error creating authorized user:', error.message);
+      showError(`Failed to create user: ${error.message}`);
     } finally {
-      setIsInviting(false);
+      setIsCreating(false);
     }
   };
 
@@ -144,14 +179,8 @@ const UserManagementPage: React.FC = () => {
     );
   }
 
-  // Check if the current user is an owner (owner_id is NULL in their profile)
-  // This check should ideally be done on the server-side for full security,
-  // but for UI purposes, we can do a client-side check.
-  // A more robust solution would involve fetching the current user's profile
-  // and checking their owner_id. For now, we assume if they are logged in and
-  // accessing this page, they are an owner.
-  // TODO: Implement a proper check for owner status.
-  const isCurrentUserOwner = true; // Placeholder for now, needs actual check
+  // Proper owner check from profile
+  const isCurrentUserOwner = currentProfile?.role === 'owner' && currentProfile?.owner_id === null;
 
   if (!isCurrentUserOwner) {
     return (
@@ -163,18 +192,18 @@ const UserManagementPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md mt-8">
+      <div className="w-full max-w-5xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md mt-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">User Management</h1>
 
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <UserPlusIcon className="mr-2 h-5 w-5" /> Invite New User
+              <UserCogIcon className="mr-2 h-5 w-5" /> Add Authorized User
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onInviteSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onCreateSubUser)} className="space-y-4">
                 <FormField
                   control={form.control}
                   name="first_name"
@@ -206,7 +235,7 @@ const UserManagementPage: React.FC = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Email (used for login)</FormLabel>
                       <FormControl>
                         <Input placeholder="jane.doe@example.com" type="email" {...field} />
                       </FormControl>
@@ -214,29 +243,94 @@ const UserManagementPage: React.FC = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isInviting}>
-                  {isInviting ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="job_role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Job Role</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g. Notary Agent" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="supervisor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Supervisor</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g. John Smith" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="privileges"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Privileges</FormLabel>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {PRIVILEGE_OPTIONS.map((opt) => {
+                          const checked = Array.isArray(field.value) ? field.value.includes(opt) : false;
+                          return (
+                            <label key={opt} className="flex items-center gap-2 p-2 rounded border border-gray-200 dark:border-gray-700">
+                              <Checkbox
+                                checked={checked}
+                                onCheckedChange={(val) => {
+                                  const isOn = Boolean(val);
+                                  const current = Array.isArray(field.value) ? field.value : [];
+                                  if (isOn && !current.includes(opt)) {
+                                    field.onChange([...current, opt]);
+                                  } else if (!isOn) {
+                                    field.onChange(current.filter((v: string) => v !== opt));
+                                  }
+                                }}
+                              />
+                              <span className="text-sm capitalize">{opt.replace(/_/g, ' ')}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit" className="w-full" disabled={isCreating}>
+                  {isCreating ? (
                     <>
-                      <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Sending Invitation...
+                      <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Creating User...
                     </>
                   ) : (
-                    'Send Invitation'
+                    'Create Authorized User'
                   )}
                 </Button>
               </form>
             </Form>
+            <p className="text-xs text-gray-500 mt-2">
+              Note: A temporary password will be generated automatically; share it with the user for their first login.
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <UsersIcon className="mr-2 h-5 w-5" /> Your Sub-Users
+              <UsersIcon className="mr-2 h-5 w-5" /> Your Authorized Users
             </CardTitle>
           </CardHeader>
           <CardContent>
             {subUsers.length === 0 ? (
-              <p className="text-center text-gray-600 dark:text-gray-400">No sub-users found. Invite your first team member!</p>
+              <p className="text-center text-gray-600 dark:text-gray-400">No authorized users found. Add your first team member!</p>
             ) : (
               <div className="overflow-x-auto">
                 <Table>
@@ -244,8 +338,10 @@ const UserManagementPage: React.FC = () => {
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
+                      <TableHead>Job Role</TableHead>
+                      <TableHead>Supervisor</TableHead>
+                      <TableHead>Privileges</TableHead>
                       <TableHead>Member Since</TableHead>
-                      {/* Add columns for roles/permissions here later */}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -253,6 +349,15 @@ const UserManagementPage: React.FC = () => {
                       <TableRow key={subUser.id}>
                         <TableCell className="font-medium">{subUser.first_name} {subUser.last_name}</TableCell>
                         <TableCell>{subUser.email}</TableCell>
+                        <TableCell>{subUser.job_role || '-'}</TableCell>
+                        <TableCell>{subUser.supervisor || '-'}</TableCell>
+                        <TableCell className="space-x-1">
+                          {subUser.privileges?.length
+                            ? subUser.privileges.map((p) => (
+                                <Badge key={p} variant="secondary" className="capitalize">{p.replace(/_/g, ' ')}</Badge>
+                              ))
+                            : <span className="text-gray-500">-</span>}
+                        </TableCell>
                         <TableCell>{new Date(subUser.created_at).toLocaleDateString()}</TableCell>
                       </TableRow>
                     ))}

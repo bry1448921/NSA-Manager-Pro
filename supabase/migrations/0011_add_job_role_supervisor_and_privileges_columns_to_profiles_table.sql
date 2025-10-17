@@ -1,0 +1,4 @@
+ALTER TABLE public.profiles 
+  ADD COLUMN IF NOT EXISTS job_role TEXT,
+  ADD COLUMN IF NOT EXISTS supervisor TEXT,
+  ADD COLUMN IF NOT EXISTS privileges JSONB DEFAULT '[]'::jsonb;
