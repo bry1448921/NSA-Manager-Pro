@@ -21,9 +21,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserIcon } from 'lucide-react';
 
 const profileFormSchema = z.object({
-  first_name: z.string().optional().or(z.literal('')), // Made truly optional
-  last_name: z.string().optional().or(z.literal('')),  // Made truly optional
+  first_name: z.string().optional().or(z.literal('')),
+  last_name: z.string().optional().or(z.literal('')),
   avatar_url: z.string().url({ message: 'Invalid URL.' }).optional().or(z.literal('')),
+  company: z.string().optional().or(z.literal('')),
+  phone_number: z.string().optional().or(z.literal('')),
+  billing_address: z.string().optional().or(z.literal('')),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -42,6 +45,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
       first_name: '',
       last_name: '',
       avatar_url: '',
+      company: '',
+      phone_number: '',
+      billing_address: '',
     },
   });
 
@@ -51,7 +57,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
       setLoading(true);
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name, avatar_url')
+        .select('first_name, last_name, avatar_url, company, phone_number, billing_address')
         .eq('id', user.id)
         .single();
 
@@ -63,6 +69,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
           first_name: data.first_name || '',
           last_name: data.last_name || '',
           avatar_url: data.avatar_url || '',
+          company: data.company || '',
+          phone_number: data.phone_number || '',
+          billing_address: data.billing_address || '',
         });
       }
       setLoading(false);
@@ -85,6 +94,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
             first_name: values.first_name || null,
             last_name: values.last_name || null,
             avatar_url: values.avatar_url || null,
+            company: values.company || null,
+            phone_number: values.phone_number || null,
+            billing_address: values.billing_address || null,
             updated_at: new Date().toISOString(),
           },
           { onConflict: 'id' }
@@ -150,6 +162,45 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
               <FormLabel>Last Name</FormLabel>
               <FormControl>
                 <Input placeholder="Doe" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="company"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Company (Optional)</FormLabel>
+              <FormControl>
+                <Input placeholder="Notary Services Inc." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="phone_number"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone Number (Optional)</FormLabel>
+              <FormControl>
+                <Input placeholder="123-456-7890" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="billing_address"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Billing Address (Optional)</FormLabel>
+              <FormControl>
+                <Input placeholder="123 Main St, Anytown, USA" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
