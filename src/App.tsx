@@ -20,7 +20,9 @@ import Layout from "./components/Layout";
 import LandingPage from "./pages/LandingPage";
 import RegisterPage from "./pages/RegisterPage";
 import ClientDetailsPage from "./pages/ClientDetailsPage";
-import UserManagementPage from "./pages/UserManagementPage"; // New import
+import UserManagementPage from "./pages/UserManagementPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage"; // New import
+import AdminProtectedRoute from "./components/AdminProtectedRoute"; // New import
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 
@@ -75,7 +77,15 @@ const App = () => (
               <Route path="/manage-subscription" element={<ManageSubscriptionPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/reports" element={<ReportsPage />} />
-              <Route path="/user-management" element={<UserManagementPage />} /> {/* New User Management Route */}
+              <Route path="/user-management" element={<UserManagementPage />} />
+              <Route
+                path="/admin-dashboard"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminDashboardPage />
+                  </AdminProtectedRoute>
+                }
+              /> {/* New Admin Dashboard Route */}
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
