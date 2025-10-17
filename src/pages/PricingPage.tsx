@@ -27,8 +27,8 @@ const pricingPlans: PricingPlan[] = [
     name: "Getting Started",
     description: "Essential tools for new notaries.",
     features: [
-      "Up to 50 clients",
-      "Up to 100 notarizations/month",
+      "Up to 10 clients",
+      "Up to 20 notarizations/month",
       "Basic reporting",
     ],
     prices: [
@@ -41,10 +41,9 @@ const pricingPlans: PricingPlan[] = [
     name: "Up and Running",
     description: "Grow your business with advanced features.",
     features: [
-      "Unlimited clients",
-      "Unlimited notarizations",
+      "Up to 50 clients",
+      "Up to 100 notarizations/month",
       "Advanced reporting",
-      "Client portal access",
     ],
     prices: [
       { term: "Monthly", price: "$25", priceId: "price_1RqPdr2WGHZ3r9wpCuhUEuIg" },
