@@ -11,7 +11,7 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white">
       {/* Header with Login/Register */}
       <header className="container mx-auto px-4 py-6 flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">Notary Office Manager</h1>
+        <h1 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">NSA Manager Pro</h1>
         <nav className="space-x-4">
           <Button asChild variant="outline">
             <Link to="/login">Login</Link>
@@ -98,7 +98,7 @@ const LandingPage: React.FC = () => {
 
       {/* Footer */}
       <footer className="py-8 text-center text-gray-600 dark:text-gray-400">
-        <p>&copy; {new Date().getFullYear()} Notary Office Manager. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} NSA Manager Pro. All rights reserved.</p>
       </footer>
     </div>
   );

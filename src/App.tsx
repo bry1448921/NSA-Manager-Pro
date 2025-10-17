@@ -32,6 +32,7 @@ import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 import { useSubscription } from "./hooks/use-subscription";
+import FinancesPage from "./pages/FinancesPage";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,7 @@ const App = () => (
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
               <Route path="/bank-accounts" element={<BankAccountsPage />} />
+              <Route path="/finances" element={<FinancesPage />} />
               <Route path="/income" element={<IncomePage />} />
               <Route path="/expenses" element={<ExpensesPage />} />
               <Route path="/notary-credentials" element={<NotaryCredentialsPage />} />

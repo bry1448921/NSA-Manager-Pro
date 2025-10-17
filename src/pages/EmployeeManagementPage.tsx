@@ -48,7 +48,7 @@ const EmployeeManagementPage: React.FC = () => {
         }
         setEmployees(data || []);
       });
-    query.finally(() => setLoading(false));
+    Promise.resolve(query).finally(() => setLoading(false));
   }, [user]);
 
   const addEmployee = async () => {

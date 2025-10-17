@@ -46,15 +46,14 @@ const MainSidebar: React.FC = () => {
 
   const sidebarContent = (
     <div className="flex flex-col h-full p-4">
-      <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Notary Manager</h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">NSA Manager Pro</h2>
       <nav className="flex flex-col space-y-2 flex-grow">
         <NavLink to="/dashboard" icon={<LayoutDashboardIcon className="h-5 w-5" />} label="Dashboard" onClick={closeSheet} />
         <NavLink to="/clients" icon={<UsersIcon className="h-5 w-5" />} label="Clients" onClick={closeSheet} />
         <NavLink to="/notarizations" icon={<FileTextIcon className="h-5 w-5" />} label="Notarizations" onClick={closeSheet} />
         <NavLink to="/orders" icon={<LayoutDashboardIcon className="h-5 w-5" />} label="Orders" onClick={closeSheet} />
         <NavLink to="/bank-accounts" icon={<BanknoteIcon className="h-5 w-5" />} label="Bank Accounts" onClick={closeSheet} />
-        <NavLink to="/income" icon={<DollarSignIcon className="h-5 w-5" />} label="Income" onClick={closeSheet} />
-        <NavLink to="/expenses" icon={<ReceiptTextIcon className="h-5 w-5" />} label="Expenses" onClick={closeSheet} />
+        <NavLink to="/finances" icon={<DollarSignIcon className="h-5 w-5" />} label="Finances" onClick={closeSheet} />
         <NavLink to="/notary-credentials" icon={<StampIcon className="h-5 w-5" />} label="Notary Credentials" onClick={closeSheet} />
         <NavLink to="/reports" icon={<BarChart3Icon className="h-5 w-5" />} label="Reports" onClick={closeSheet} />
         <NavLink to="/user-management" icon={<UserPlusIcon className="h-5 w-5" />} label="User Management" onClick={closeSheet} />

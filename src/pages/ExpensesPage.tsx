@@ -30,6 +30,7 @@ interface Expense {
   amount: number;
   description: string | null;
   expense_date: string;
+  due_date: string | null;
   category: 'office_supplies' | 'travel' | 'education' | 'marketing' | 'other';
   bank_accounts: {
     account_name: string;
@@ -55,6 +56,7 @@ const ExpensesPage: React.FC = () => {
         amount,
         description,
         expense_date,
+        due_date,
         category,
         bank_accounts (account_name, bank_name)
       `)
@@ -147,6 +149,7 @@ const ExpensesPage: React.FC = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
+                  <TableHead>Due Date</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Account</TableHead>
@@ -158,6 +161,7 @@ const ExpensesPage: React.FC = () => {
                 {expenseRecords.map((expense) => (
                   <TableRow key={expense.id}>
                     <TableCell>{format(new Date(expense.expense_date), 'PPP')}</TableCell>
+                    <TableCell>{expense.due_date ? format(new Date(expense.due_date), 'PPP') : '-'}</TableCell>
                     <TableCell>{expense.category.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}</TableCell>
                     <TableCell className="max-w-[200px] truncate">{expense.description || '-'}</TableCell>
                     <TableCell>

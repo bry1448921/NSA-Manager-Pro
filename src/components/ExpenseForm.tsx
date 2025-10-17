@@ -40,6 +40,7 @@ const expenseFormSchema = z.object({
   ),
   description: z.string().optional(),
   expense_date: z.date({ required_error: 'Expense date is required.' }),
+  due_date: z.date({ required_error: 'Due date is required.' }),
   category: z.enum(['office_supplies', 'travel', 'education', 'marketing', 'other'], {
     required_error: 'Category is required.',
   }),
@@ -55,6 +56,7 @@ interface ExpenseFormProps {
     amount: number;
     description: string | null;
     expense_date: string; // ISO string from DB
+    due_date: string | null;
     category: 'office_supplies' | 'travel' | 'education' | 'marketing' | 'other';
   };
 }
@@ -76,6 +78,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSuccess, initialData }) => 
       ? {
           ...initialData,
           expense_date: new Date(initialData.expense_date),
+          due_date: initialData.due_date ? new Date(initialData.due_date) : new Date(),
           account_id: initialData.account_id || '',
         }
       : {
@@ -83,6 +86,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSuccess, initialData }) => 
           amount: 0,
           description: '',
           expense_date: new Date(),
+          due_date: new Date(),
           category: 'office_supplies',
         },
   });
@@ -121,6 +125,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSuccess, initialData }) => 
         amount: values.amount,
         description: values.description || null,
         expense_date: format(values.expense_date, 'yyyy-MM-dd'),
+        due_date: format(values.due_date, 'yyyy-MM-dd'),
         category: values.category,
       };
 
@@ -240,6 +245,41 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSuccess, initialData }) => 
                     selected={field.value}
                     onSelect={field.onChange}
                     disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="due_date"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Due Date</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={'outline'}
+                      className={cn(
+                        'w-full pl-3 text-left font-normal',
+                        !field.value && 'text-muted-foreground',
+                      )}
+                    >
+                      {field.value ? format(field.value, 'PPP') : <span>Pick a due date</span>}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) => date < new Date('1900-01-01')}
                     initialFocus
                   />
                 </PopoverContent>

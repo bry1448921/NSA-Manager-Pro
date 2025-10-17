@@ -43,7 +43,7 @@ const VendorManagementPage: React.FC = () => {
         }
         setVendors(data || []);
       });
-    query.finally(() => setLoading(false));
+    Promise.resolve(query).finally(() => setLoading(false));
   }, [user]);
 
   const addVendor = async () => {
