@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { MenuIcon, UsersIcon, FileTextIcon, LayoutDashboardIcon, UserIcon, LogOutIcon, BanknoteIcon, DollarSignIcon, ReceiptTextIcon, StampIcon, CreditCardIcon, BarChart3Icon } from 'lucide-react'; // Added BarChart3Icon for Reports
+import { MenuIcon, UsersIcon, FileTextIcon, LayoutDashboardIcon, UserIcon, LogOutIcon, BanknoteIcon, DollarSignIcon, ReceiptTextIcon, StampIcon, CreditCardIcon, BarChart3Icon, UserPlusIcon } from 'lucide-react'; // Added UserPlusIcon for User Management
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSession } from '@/contexts/SessionContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -56,7 +56,8 @@ const MainSidebar: React.FC = () => {
         <NavLink to="/income" icon={<DollarSignIcon className="h-5 w-5" />} label="Income" onClick={closeSheet} />
         <NavLink to="/expenses" icon={<ReceiptTextIcon className="h-5 w-5" />} label="Expenses" onClick={closeSheet} />
         <NavLink to="/notary-credentials" icon={<StampIcon className="h-5 w-5" />} label="Notary Credentials" onClick={closeSheet} />
-        <NavLink to="/reports" icon={<BarChart3Icon className="h-5 w-5" />} label="Reports" onClick={closeSheet} /> {/* New Reports Link */}
+        <NavLink to="/reports" icon={<BarChart3Icon className="h-5 w-5" />} label="Reports" onClick={closeSheet} />
+        <NavLink to="/user-management" icon={<UserPlusIcon className="h-5 w-5" />} label="User Management" onClick={closeSheet} /> {/* New User Management Link */}
         <NavLink to="/pricing" icon={<CreditCardIcon className="h-5 w-5" />} label="Pricing" onClick={closeSheet} />
         <NavLink to="/manage-subscription" icon={<CreditCardIcon className="h-5 w-5" />} label="Manage Subscription" onClick={closeSheet} />
         <NavLink to="/profile" icon={<UserIcon className="h-5 w-5" />} label="Profile" onClick={closeSheet} />
