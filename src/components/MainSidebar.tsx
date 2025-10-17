@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { MenuIcon, UsersIcon, FileTextIcon, PackageIcon, UserIcon, LogOutIcon, BanknoteIcon, DollarSignIcon, ReceiptTextIcon, StampIcon } from 'lucide-react'; // Added new icons
+import { MenuIcon, UsersIcon, FileTextIcon, PackageIcon, UserIcon, LogOutIcon, BanknoteIcon, DollarSignIcon, ReceiptTextIcon, StampIcon, CreditCardIcon } from 'lucide-react'; // Added new icons
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSession } from '@/contexts/SessionContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -51,7 +51,9 @@ const MainSidebar: React.FC = () => {
         <NavLink to="/bank-accounts" icon={<BanknoteIcon className="h-5 w-5" />} label="Bank Accounts" onClick={closeSheet} />
         <NavLink to="/income" icon={<DollarSignIcon className="h-5 w-5" />} label="Income" onClick={closeSheet} />
         <NavLink to="/expenses" icon={<ReceiptTextIcon className="h-5 w-5" />} label="Expenses" onClick={closeSheet} />
-        <NavLink to="/notary-credentials" icon={<StampIcon className="h-5 w-5" />} label="Notary Credentials" onClick={closeSheet} /> {/* New link */}
+        <NavLink to="/notary-credentials" icon={<StampIcon className="h-5 w-5" />} label="Notary Credentials" onClick={closeSheet} />
+        <NavLink to="/pricing" icon={<CreditCardIcon className="h-5 w-5" />} label="Pricing" onClick={closeSheet} /> {/* New link */}
+        <NavLink to="/manage-subscription" icon={<CreditCardIcon className="h-5 w-5" />} label="Manage Subscription" onClick={closeSheet} /> {/* New link */}
         <NavLink to="/profile" icon={<UserIcon className="h-5 w-5" />} label="Profile" onClick={closeSheet} />
       </nav>
       <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">

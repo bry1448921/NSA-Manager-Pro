@@ -12,7 +12,9 @@ import OrdersPage from "./pages/OrdersPage";
 import BankAccountsPage from "./pages/BankAccountsPage";
 import IncomePage from "./pages/IncomePage";
 import ExpensesPage from "./pages/ExpensesPage";
-import NotaryCredentialsPage from "./pages/NotaryCredentialsPage"; // New import
+import NotaryCredentialsPage from "./pages/NotaryCredentialsPage";
+import PricingPage from "./pages/PricingPage"; // New import
+import ManageSubscriptionPage from "./pages/ManageSubscriptionPage"; // New import
 import Layout from "./components/Layout";
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
@@ -46,6 +48,7 @@ const App = () => (
         <SessionContextProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/pricing" element={<PricingPage />} /> {/* Public pricing page */}
             <Route
               element={
                 <ProtectedRoute>
@@ -60,7 +63,8 @@ const App = () => (
               <Route path="/bank-accounts" element={<BankAccountsPage />} />
               <Route path="/income" element={<IncomePage />} />
               <Route path="/expenses" element={<ExpensesPage />} />
-              <Route path="/notary-credentials" element={<NotaryCredentialsPage />} /> {/* New route */}
+              <Route path="/notary-credentials" element={<NotaryCredentialsPage />} />
+              <Route path="/manage-subscription" element={<ManageSubscriptionPage />} /> {/* Protected subscription management */}
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
