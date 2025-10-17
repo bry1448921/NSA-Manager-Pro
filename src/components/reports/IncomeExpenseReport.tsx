@@ -6,14 +6,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { showError } from '@/utils/toast';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { AccountFilter } from '@/components/reports/AccountFilter';
+import { CategoryFilter } from '@/components/reports/CategoryFilter'; // New import
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2Icon, DownloadIcon, DollarSignIcon, ReceiptTextIcon, FileDownIcon } from 'lucide-react'; // Added FileDownIcon
+import { Loader2Icon, DownloadIcon, DollarSignIcon, ReceiptTextIcon, FileDownIcon } from 'lucide-react';
 import { exportToCsv } from '@/utils/report-exports';
-import { exportToPdf } from '@/utils/report-pdf-exports'; // New import
+import { exportToPdf } from '@/utils/report-pdf-exports';
 
 interface IncomeRecord {
   id: string;
@@ -43,6 +44,8 @@ const IncomeExpenseReport: React.FC = () => {
     to: undefined,
   });
   const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);
+  const [selectedIncomeCategory, setSelectedIncomeCategory] = useState<string | undefined>(undefined); // New state
+  const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<string | undefined>(undefined); // New state
 
   const fetchReportData = useCallback(async () => {
     if (!user) return;
@@ -84,6 +87,12 @@ const IncomeExpenseReport: React.FC = () => {
         incomeQuery = incomeQuery.eq('account_id', selectedAccountId);
         expenseQuery = expenseQuery.eq('account_id', selectedAccountId);
       }
+      if (selectedIncomeCategory) { // Apply income category filter
+        incomeQuery = incomeQuery.eq('category', selectedIncomeCategory);
+      }
+      if (selectedExpenseCategory) { // Apply expense category filter
+        expenseQuery = expenseQuery.eq('category', selectedExpenseCategory);
+      }
 
       const { data: incomeData, error: incomeError } = await incomeQuery.order('income_date', { ascending: false });
       const { data: expenseData, error: expenseError } = await expenseQuery.order('expense_date', { ascending: false });
@@ -99,7 +108,7 @@ const IncomeExpenseReport: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, dateRange, selectedAccountId]);
+  }, [user, dateRange, selectedAccountId, selectedIncomeCategory, selectedExpenseCategory]); // Add new dependencies
 
   useEffect(() => {
     fetchReportData();
@@ -149,6 +158,8 @@ const IncomeExpenseReport: React.FC = () => {
       <div className="flex flex-wrap gap-4 items-end">
         <DateRangePicker date={dateRange} setDate={setDateRange} />
         <AccountFilter selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} />
+        <CategoryFilter type="income" selectedCategory={selectedIncomeCategory} onSelectCategory={setSelectedIncomeCategory} /> {/* New Income Category Filter */}
+        <CategoryFilter type="expense" selectedCategory={selectedExpenseCategory} onSelectCategory={setSelectedExpenseCategory} /> {/* New Expense Category Filter */}
         <Button onClick={handleExportCsv} disabled={loading}>
           <DownloadIcon className="mr-2 h-4 w-4" /> Export CSV
         </Button>
@@ -163,7 +174,7 @@ const IncomeExpenseReport: React.FC = () => {
           <p className="ml-2 text-lg text-gray-700 dark:text-gray-300">Loading report...</p>
         </div>
       ) : (
-        <div id="income-expense-report-content" className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm"> {/* Added ID for PDF export */}
+        <div id="income-expense-report-content" className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -224,7 +235,7 @@ const IncomeExpenseReport: React.FC = () => {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+            </Table>
             </div>
           )}
 
