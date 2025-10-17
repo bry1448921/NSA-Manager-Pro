@@ -15,8 +15,9 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2Icon, DownloadIcon, FileTextIcon } from 'lucide-react';
+import { Loader2Icon, DownloadIcon, FileTextIcon, FileDownIcon } from 'lucide-react'; // Added FileDownIcon
 import { exportToCsv } from '@/utils/report-exports';
+import { exportToPdf } from '@/utils/report-pdf-exports'; // New import
 import { format } from 'date-fns';
 
 interface ColumnDefinition {
@@ -212,6 +213,14 @@ const CustomReportForm: React.FC = () => {
     exportToCsv(`${dataSource}_custom_report.csv`, formattedData, headers);
   };
 
+  const handleExportPdf = () => {
+    if (reportData.length === 0) {
+      showError('No data to export to PDF.');
+      return;
+    }
+    exportToPdf('custom-report-content', `${dataSource}_custom_report.pdf`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -267,10 +276,13 @@ const CustomReportForm: React.FC = () => {
         <Button onClick={handleExportCsv} disabled={reportData.length === 0 || loading} variant="outline">
           <DownloadIcon className="mr-2 h-4 w-4" /> Export CSV
         </Button>
+        <Button onClick={handleExportPdf} disabled={reportData.length === 0 || loading} variant="outline">
+          <FileDownIcon className="mr-2 h-4 w-4" /> Export PDF
+        </Button>
       </div>
 
       {reportGenerated && reportData.length > 0 && (
-        <div className="mt-8">
+        <div id="custom-report-content" className="mt-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm"> {/* Added ID for PDF export */}
           <h3 className="text-xl font-semibold mb-4">Generated Report</h3>
           <div className="overflow-x-auto border rounded-md">
             <Table>

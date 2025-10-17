@@ -11,8 +11,9 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2Icon, DownloadIcon } from 'lucide-react';
+import { Loader2Icon, DownloadIcon, DollarSignIcon, ReceiptTextIcon, FileDownIcon } from 'lucide-react'; // Added FileDownIcon
 import { exportToCsv } from '@/utils/report-exports';
+import { exportToPdf } from '@/utils/report-pdf-exports'; // New import
 
 interface IncomeRecord {
   id: string;
@@ -139,6 +140,10 @@ const IncomeExpenseReport: React.FC = () => {
     exportToCsv('income_expense_report.csv', reportData, headers);
   };
 
+  const handleExportPdf = () => {
+    exportToPdf('income-expense-report-content', 'income_expense_report.pdf');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-4 items-end">
@@ -146,6 +151,9 @@ const IncomeExpenseReport: React.FC = () => {
         <AccountFilter selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} />
         <Button onClick={handleExportCsv} disabled={loading}>
           <DownloadIcon className="mr-2 h-4 w-4" /> Export CSV
+        </Button>
+        <Button onClick={handleExportPdf} disabled={loading} variant="outline">
+          <FileDownIcon className="mr-2 h-4 w-4" /> Export PDF
         </Button>
       </div>
 
@@ -155,7 +163,7 @@ const IncomeExpenseReport: React.FC = () => {
           <p className="ml-2 text-lg text-gray-700 dark:text-gray-300">Loading report...</p>
         </div>
       ) : (
-        <>
+        <div id="income-expense-report-content" className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm"> {/* Added ID for PDF export */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -251,7 +259,7 @@ const IncomeExpenseReport: React.FC = () => {
               </Table>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );

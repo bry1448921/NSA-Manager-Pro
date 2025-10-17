@@ -7,8 +7,9 @@ import { showError } from '@/utils/toast';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2Icon, DownloadIcon, BanknoteIcon } from 'lucide-react';
+import { Loader2Icon, DownloadIcon, BanknoteIcon, FileDownIcon } from 'lucide-react'; // Added FileDownIcon
 import { exportToCsv } from '@/utils/report-exports';
+import { exportToPdf } from '@/utils/report-pdf-exports'; // New import
 
 interface BankAccount {
   id: string;
@@ -67,11 +68,18 @@ const BalanceSheetReport: React.FC = () => {
     exportToCsv('balance_sheet_report.csv', reportData, headers);
   };
 
+  const handleExportPdf = () => {
+    exportToPdf('balance-sheet-report-content', 'balance_sheet_report.pdf');
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
         <Button onClick={handleExportCsv} disabled={loading}>
           <DownloadIcon className="mr-2 h-4 w-4" /> Export CSV
+        </Button>
+        <Button onClick={handleExportPdf} disabled={loading} variant="outline">
+          <FileDownIcon className="mr-2 h-4 w-4" /> Export PDF
         </Button>
       </div>
 
@@ -81,7 +89,7 @@ const BalanceSheetReport: React.FC = () => {
           <p className="ml-2 text-lg text-gray-700 dark:text-gray-300">Loading report...</p>
         </div>
       ) : (
-        <>
+        <div id="balance-sheet-report-content" className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm"> {/* Added ID for PDF export */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
@@ -119,7 +127,7 @@ const BalanceSheetReport: React.FC = () => {
               </Table>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
