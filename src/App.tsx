@@ -9,7 +9,10 @@ import ClientsPage from "./pages/ClientsPage";
 import NotarizationsPage from "./pages/NotarizationsPage";
 import ProfilePage from "./pages/ProfilePage";
 import OrdersPage from "./pages/OrdersPage";
-import Layout from "./components/Layout"; // Import the new Layout component
+import BankAccountsPage from "./pages/BankAccountsPage"; // New import
+import IncomePage from "./pages/IncomePage"; // New import
+import ExpensesPage from "./pages/ExpensesPage"; // New import
+import Layout from "./components/Layout";
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 
@@ -37,13 +40,11 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      {/* Removed shadcn/ui Toaster, now only using Sonner */}
       <Sonner />
       <BrowserRouter>
         <SessionContextProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
-            {/* Protected routes nested under the Layout component */}
             <Route
               element={
                 <ProtectedRoute>
@@ -54,8 +55,11 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/clients" element={<ClientsPage />} />
               <Route path="/notarizations" element={<NotarizationsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/bank-accounts" element={<BankAccountsPage />} /> {/* New route */}
+              <Route path="/income" element={<IncomePage />} /> {/* New route */}
+              <Route path="/expenses" element={<ExpensesPage />} /> {/* New route */}
+              <Route path="/profile" element={<ProfilePage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
