@@ -60,9 +60,7 @@ const MainSidebar: React.FC = () => {
         <NavLink to="/user-management" icon={<UserPlusIcon className="h-5 w-5" />} label="User Management" onClick={closeSheet} />
         {profile?.role === 'admin' && (
           <>
-            <NavLink to="/admin-overview" icon={<MonitorIcon className="h-5 w-5" />} label="Admin Overview" onClick={closeSheet} /> {/* New Admin Overview Link */}
-            <NavLink to="/admin-dashboard" icon={<ShieldCheckIcon className="h-5 w-5" />} label="Admin User Management" onClick={closeSheet} /> {/* Renamed Admin Dashboard Link */}
-            <NavLink to="/admin-sales-reports" icon={<LineChartIcon className="h-5 w-5" />} label="Admin Sales Reports" onClick={closeSheet} />
+            <NavLink to="/admin" icon={<ShieldCheckIcon className="h-5 w-5" />} label="Admin" onClick={closeSheet} />
           </>
         )}
         <NavLink to="/pricing" icon={<CreditCardIcon className="h-5 w-5" />} label="Pricing" onClick={closeSheet} />

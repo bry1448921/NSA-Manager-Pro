@@ -24,6 +24,9 @@ import UserManagementPage from "./pages/UserManagementPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage"; // This will now be Admin User Management
 import AdminSalesReportsPage from "./pages/AdminSalesReportsPage";
 import AdminOverviewPage from "./pages/AdminOverviewPage"; // New import
+import AdminHubPage from "./pages/AdminHubPage";
+import EmployeeManagementPage from "./pages/EmployeeManagementPage";
+import VendorManagementPage from "./pages/VendorManagementPage";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
@@ -102,6 +105,30 @@ const App = () => (
                 element={
                   <AdminProtectedRoute>
                     <AdminDashboardPage />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin" 
+                element={
+                  <AdminProtectedRoute>
+                    <AdminHubPage />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/employees" 
+                element={
+                  <AdminProtectedRoute>
+                    <EmployeeManagementPage />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/vendors" 
+                element={
+                  <AdminProtectedRoute>
+                    <VendorManagementPage />
                   </AdminProtectedRoute>
                 }
               />
