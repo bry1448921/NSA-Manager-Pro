@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { MenuIcon, UsersIcon, FileTextIcon, PackageIcon, UserIcon, LogOutIcon, BanknoteIcon, DollarSignIcon, ReceiptTextIcon, StampIcon, CreditCardIcon } from 'lucide-react'; // Added new icons
+import { MenuIcon, UsersIcon, FileTextIcon, LayoutDashboardIcon, UserIcon, LogOutIcon, BanknoteIcon, DollarSignIcon, ReceiptTextIcon, StampIcon, CreditCardIcon } from 'lucide-react'; // Changed PackageIcon to LayoutDashboardIcon for clarity
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSession } from '@/contexts/SessionContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,7 +29,7 @@ const NavLink: React.FC<NavLinkProps> = ({ to, icon, label, onClick }) => (
 const MainSidebar: React.FC = () => {
   const isMobile = useIsMobile();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { user } = useSession();
+  const { user, isLoading: isSessionLoading } = useSession(); // Get isLoading from useSession
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -40,20 +40,25 @@ const MainSidebar: React.FC = () => {
 
   const closeSheet = () => setIsSheetOpen(false);
 
+  // Only render sidebar content if user is logged in and session is not loading
+  if (!user && !isSessionLoading) {
+    return null; // Don't render sidebar if not authenticated
+  }
+
   const sidebarContent = (
     <div className="flex flex-col h-full p-4">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Notary Manager</h2>
       <nav className="flex flex-col space-y-2 flex-grow">
-        <NavLink to="/" icon={<PackageIcon className="h-5 w-5" />} label="Dashboard" onClick={closeSheet} />
+        <NavLink to="/dashboard" icon={<LayoutDashboardIcon className="h-5 w-5" />} label="Dashboard" onClick={closeSheet} />
         <NavLink to="/clients" icon={<UsersIcon className="h-5 w-5" />} label="Clients" onClick={closeSheet} />
         <NavLink to="/notarizations" icon={<FileTextIcon className="h-5 w-5" />} label="Notarizations" onClick={closeSheet} />
-        <NavLink to="/orders" icon={<PackageIcon className="h-5 w-5" />} label="Orders" onClick={closeSheet} />
+        <NavLink to="/orders" icon={<LayoutDashboardIcon className="h-5 w-5" />} label="Orders" onClick={closeSheet} />
         <NavLink to="/bank-accounts" icon={<BanknoteIcon className="h-5 w-5" />} label="Bank Accounts" onClick={closeSheet} />
         <NavLink to="/income" icon={<DollarSignIcon className="h-5 w-5" />} label="Income" onClick={closeSheet} />
         <NavLink to="/expenses" icon={<ReceiptTextIcon className="h-5 w-5" />} label="Expenses" onClick={closeSheet} />
         <NavLink to="/notary-credentials" icon={<StampIcon className="h-5 w-5" />} label="Notary Credentials" onClick={closeSheet} />
-        <NavLink to="/pricing" icon={<CreditCardIcon className="h-5 w-5" />} label="Pricing" onClick={closeSheet} /> {/* New link */}
-        <NavLink to="/manage-subscription" icon={<CreditCardIcon className="h-5 w-5" />} label="Manage Subscription" onClick={closeSheet} /> {/* New link */}
+        <NavLink to="/pricing" icon={<CreditCardIcon className="h-5 w-5" />} label="Pricing" onClick={closeSheet} />
+        <NavLink to="/manage-subscription" icon={<CreditCardIcon className="h-5 w-5" />} label="Manage Subscription" onClick={closeSheet} />
         <NavLink to="/profile" icon={<UserIcon className="h-5 w-5" />} label="Profile" onClick={closeSheet} />
       </nav>
       <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">

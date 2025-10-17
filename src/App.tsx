@@ -13,9 +13,11 @@ import BankAccountsPage from "./pages/BankAccountsPage";
 import IncomePage from "./pages/IncomePage";
 import ExpensesPage from "./pages/ExpensesPage";
 import NotaryCredentialsPage from "./pages/NotaryCredentialsPage";
-import PricingPage from "./pages/PricingPage"; // New import
-import ManageSubscriptionPage from "./pages/ManageSubscriptionPage"; // New import
+import PricingPage from "./pages/PricingPage";
+import ManageSubscriptionPage from "./pages/ManageSubscriptionPage";
 import Layout from "./components/Layout";
+import LandingPage from "./pages/LandingPage"; // New import
+import RegisterPage from "./pages/RegisterPage"; // New import
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 
@@ -47,7 +49,9 @@ const App = () => (
       <BrowserRouter>
         <SessionContextProvider>
           <Routes>
+            <Route path="/" element={<LandingPage />} /> {/* New landing page as default */}
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<RegisterPage />} /> {/* New registration page */}
             <Route path="/pricing" element={<PricingPage />} /> {/* Public pricing page */}
             <Route
               element={
@@ -56,7 +60,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             >
-              <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<Index />} /> {/* Dashboard is now protected */}
               <Route path="/clients" element={<ClientsPage />} />
               <Route path="/notarizations" element={<NotarizationsPage />} />
               <Route path="/orders" element={<OrdersPage />} />
@@ -64,7 +68,7 @@ const App = () => (
               <Route path="/income" element={<IncomePage />} />
               <Route path="/expenses" element={<ExpensesPage />} />
               <Route path="/notary-credentials" element={<NotaryCredentialsPage />} />
-              <Route path="/manage-subscription" element={<ManageSubscriptionPage />} /> {/* Protected subscription management */}
+              <Route path="/manage-subscription" element={<ManageSubscriptionPage />} />
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

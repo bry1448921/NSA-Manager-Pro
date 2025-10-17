@@ -13,7 +13,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (session && !isLoading) {
-      navigate('/');
+      navigate('/dashboard'); // Redirect to the new dashboard path
     }
   }, [session, isLoading, navigate]);
 
@@ -46,7 +46,7 @@ const Login: React.FC = () => {
             },
           }}
           theme="light" // Use 'dark' if your app primarily uses dark theme
-          redirectTo={window.location.origin + '/'}
+          redirectTo={window.location.origin + '/dashboard'} // Redirect to the new dashboard path
         />
       </div>
     </div>
