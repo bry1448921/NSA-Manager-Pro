@@ -3,26 +3,37 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from '@/contexts/SessionContext';
 import { supabase } from '@/integrations/supabase/client';
-import { showError } from '@/utils/toast';
+import { showError, showSuccess } from '@/utils/toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2Icon, UsersIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Loader2Icon, UsersIcon, MoreHorizontalIcon, MailIcon, BanIcon, CheckCircleIcon, UserCogIcon } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface UserProfile {
   id: string;
   first_name: string | null;
   last_name: string | null;
-  email: string; // Assuming email can be fetched or is part of profile for admin
+  email: string;
   role: 'owner' | 'sub_user' | 'admin';
   owner_id: string | null;
-  created_at: string; // Assuming created_at is available from profiles or auth.users
+  created_at: string;
+  is_active: boolean; // Added is_active
 }
 
 const AdminDashboardPage: React.FC = () => {
   const { user: currentUser, profile: currentProfile, isLoading: isSessionLoading } = useSession();
   const [allUsers, setAllUsers] = useState<UserProfile[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null); // To track loading state for specific user actions
 
   const fetchAllUsers = useCallback(async () => {
     if (!currentUser || currentProfile?.role !== 'admin') {
@@ -32,17 +43,15 @@ const AdminDashboardPage: React.FC = () => {
 
     setLoadingUsers(true);
     try {
-      // Admins can select all profiles due to updated RLS
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, role, owner_id, created_at');
+        .select('id, first_name, last_name, role, owner_id, created_at, is_active'); // Select is_active
 
       if (profilesError) throw profilesError;
 
-      // Fetch user emails from auth.users for these profiles
       const userIds = profilesData.map(p => p.id);
       const { data: authUsersData, error: authUsersError } = await supabase
-        .from('users') // This assumes a public view or admin access to auth.users
+        .from('users')
         .select('id, email')
         .in('id', userIds);
 
@@ -58,6 +67,7 @@ const AdminDashboardPage: React.FC = () => {
           role: profile.role,
           owner_id: profile.owner_id,
           created_at: profile.created_at,
+          is_active: profile.is_active,
         };
       });
 
@@ -75,6 +85,60 @@ const AdminDashboardPage: React.FC = () => {
       fetchAllUsers();
     }
   }, [currentUser, currentProfile, isSessionLoading, fetchAllUsers]);
+
+  const handleSendPasswordReset = async (email: string) => {
+    setActionLoading(`reset-${email}`);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login?reset=true`,
+      });
+      if (error) throw error;
+      showSuccess(`Password reset email sent to ${email}.`);
+    } catch (error: any) {
+      console.error('Error sending password reset:', error.message);
+      showError(`Failed to send password reset: ${error.message}`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleToggleActiveStatus = async (userId: string, currentStatus: boolean) => {
+    setActionLoading(`toggle-active-${userId}`);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: !currentStatus })
+        .eq('id', userId);
+
+      if (error) throw error;
+      showSuccess(`User account ${!currentStatus ? 'activated' : 'suspended'} successfully!`);
+      fetchAllUsers(); // Refresh user list
+    } catch (error: any) {
+      console.error('Error toggling user active status:', error.message);
+      showError(`Failed to toggle user status: ${error.message}`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleChangeUserRole = async (userId: string, newRole: 'owner' | 'sub_user' | 'admin') => {
+    setActionLoading(`change-role-${userId}`);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('id', userId);
+
+      if (error) throw error;
+      showSuccess(`User role updated to ${newRole} successfully!`);
+      fetchAllUsers(); // Refresh user list
+    } catch (error: any) {
+      console.error('Error changing user role:', error.message);
+      showError(`Failed to change user role: ${error.message}`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   if (isSessionLoading || loadingUsers) {
     return (
@@ -108,6 +172,7 @@ const AdminDashboardPage: React.FC = () => {
                       <TableHead>Email</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>Owner</TableHead>
+                      <TableHead>Status</TableHead> {/* New column */}
                       <TableHead>Member Since</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -119,10 +184,64 @@ const AdminDashboardPage: React.FC = () => {
                         <TableCell>{user.email}</TableCell>
                         <TableCell className="capitalize">{user.role}</TableCell>
                         <TableCell>{user.owner_id ? user.owner_id : 'N/A (Owner)'}</TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${user.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}`}>
+                            {user.is_active ? 'Active' : 'Suspended'}
+                          </span>
+                        </TableCell>
                         <TableCell>{format(new Date(user.created_at), 'PPP')}</TableCell>
                         <TableCell className="text-right">
-                          {/* Placeholder for admin actions like suspend, change plan, etc. */}
-                          <Button variant="outline" size="sm" disabled>Manage</Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontalIcon className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem
+                                onClick={() => handleSendPasswordReset(user.email)}
+                                disabled={actionLoading === `reset-${user.email}`}
+                              >
+                                {actionLoading === `reset-${user.email}` ? (
+                                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                  <MailIcon className="mr-2 h-4 w-4" />
+                                )}
+                                Send Password Reset
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleToggleActiveStatus(user.id, user.is_active)}
+                                disabled={actionLoading === `toggle-active-${user.id}`}
+                              >
+                                {actionLoading === `toggle-active-${user.id}` ? (
+                                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                                ) : user.is_active ? (
+                                  <BanIcon className="mr-2 h-4 w-4 text-red-500" />
+                                ) : (
+                                  <CheckCircleIcon className="mr-2 h-4 w-4 text-green-500" />
+                                )}
+                                {user.is_active ? 'Suspend Account' : 'Activate Account'}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuLabel>Change Role</DropdownMenuLabel>
+                              {['owner', 'sub_user', 'admin'].map((role) => (
+                                <DropdownMenuItem
+                                  key={role}
+                                  onClick={() => handleChangeUserRole(user.id, role as 'owner' | 'sub_user' | 'admin')}
+                                  disabled={user.role === role || actionLoading === `change-role-${user.id}`}
+                                >
+                                  {actionLoading === `change-role-${user.id}` && user.role !== role ? (
+                                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <UserCogIcon className="mr-2 h-4 w-4" />
+                                  )}
+                                  Set as {role.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))}

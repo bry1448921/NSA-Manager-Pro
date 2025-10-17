@@ -13,13 +13,14 @@ interface Profile {
   phone_number: string | null;
   billing_address: string | null;
   owner_id: string | null;
-  role: 'owner' | 'sub_user' | 'admin'; // Added role
+  role: 'owner' | 'sub_user' | 'admin';
+  is_active: boolean; // Added is_active
 }
 
 interface SessionContextType {
   session: Session | null;
   user: User | null;
-  profile: Profile | null; // Added profile
+  profile: Profile | null;
   isLoading: boolean;
 }
 
@@ -28,7 +29,7 @@ const SessionContext = createContext<SessionContextType | undefined>(undefined);
 export const SessionContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null); // New state for profile
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUserProfile = async (userId: string) => {
