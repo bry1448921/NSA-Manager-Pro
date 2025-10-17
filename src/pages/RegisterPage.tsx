@@ -26,7 +26,15 @@ const registerFormSchema = z.object({
   last_name: z.string().min(1, { message: 'Last name is required.' }),
   company: z.string().optional().or(z.literal('')),
   phone_number: z.string().optional().or(z.literal('')),
-  billing_address: z.string().optional().or(z.literal('')),
+  billing_street: z.string().min(1, { message: 'Street address is required.' }),
+  billing_city: z.string().min(1, { message: 'City is required.' }),
+  billing_state: z
+    .string()
+    .min(2, { message: 'State must be 2 characters.' })
+    .max(2, { message: 'State must be 2 characters.' }),
+  billing_zip: z
+    .string()
+    .regex(/^\d{5}(-\d{4})?$/, { message: 'ZIP must be 5 digits or ZIP+4 (12345 or 12345-6789).' }),
   email: z.string().email({ message: 'Invalid email address.' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
 });
@@ -109,7 +117,10 @@ const RegisterPage: React.FC = () => {
       last_name: '',
       company: '',
       phone_number: '',
-      billing_address: '',
+      billing_street: '',
+      billing_city: '',
+      billing_state: '',
+      billing_zip: '',
       email: '',
       password: '',
     },
@@ -118,6 +129,9 @@ const RegisterPage: React.FC = () => {
   const onRegisterNext = async (values: RegisterFormValues) => {
     setIsSubmitting(true);
     try {
+      // Combine split billing fields into a single string for Supabase metadata/profile trigger
+      const combinedBillingAddress = `${values.billing_street}, ${values.billing_city}, ${values.billing_state} ${values.billing_zip}`;
+
       const { data, error } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
@@ -127,7 +141,7 @@ const RegisterPage: React.FC = () => {
             last_name: values.last_name,
             company: values.company,
             phone_number: values.phone_number,
-            billing_address: values.billing_address,
+            billing_address: combinedBillingAddress,
           },
         },
       });
@@ -257,19 +271,62 @@ const RegisterPage: React.FC = () => {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="billing_address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Billing Address (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="123 Main St, Anytown, USA" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="billing_street"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Billing Street</FormLabel>
+                        <FormControl>
+                          <Input placeholder="123 Main St" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="billing_city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Billing City</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Anytown" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="billing_state"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Billing State</FormLabel>
+                        <FormControl>
+                          <Input placeholder="CA" maxLength={2} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="billing_zip"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Billing ZIP</FormLabel>
+                        <FormControl>
+                          <Input placeholder="12345 or 12345-6789" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
