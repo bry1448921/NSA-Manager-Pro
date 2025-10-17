@@ -5,8 +5,8 @@ import { useSession } from '@/contexts/SessionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { showError } from '@/utils/toast';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
-import AccountFilter from '@/components/reports/AccountFilter'; // Corrected import
-import { CategoryFilter } from '@/components/reports/CategoryFilter';
+import AccountFilter from '@/components/reports/AccountFilter';
+import CategoryFilter from '@/components/reports/CategoryFilter'; // Corrected to default import
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
