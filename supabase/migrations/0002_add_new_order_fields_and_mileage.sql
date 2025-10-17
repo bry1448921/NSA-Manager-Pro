@@ -1,0 +1,10 @@
+ALTER TABLE public.orders
+  ADD COLUMN IF NOT EXISTS signing_datetime TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS location TEXT,
+  ADD COLUMN IF NOT EXISTS property_address TEXT,
+  ADD COLUMN IF NOT EXISTS rate_of_pay NUMERIC,
+  ADD COLUMN IF NOT EXISTS scanbacks_required BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS shipping_service TEXT,
+  ADD COLUMN IF NOT EXISTS tracking_number TEXT,
+  ADD COLUMN IF NOT EXISTS completion_status TEXT DEFAULT 'pending',
+  ADD COLUMN IF NOT EXISTS mileage NUMERIC;

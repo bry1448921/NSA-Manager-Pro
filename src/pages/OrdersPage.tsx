@@ -44,6 +44,7 @@ const OrdersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingOrder, setEditingOrder] = useState<Order | undefined>(undefined);
+  const [clientsForWizard, setClientsForWizard] = useState<{id:string; name:string}[]>([]);
 
   const fetchOrders = useCallback(async () => {
     if (!user) return;
@@ -75,9 +76,25 @@ const OrdersPage: React.FC = () => {
     setLoading(false);
   }, [user]);
 
+  const fetchClientsForWizard = useCallback(async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('clients')
+      .select('id, first_name, last_name')
+      .eq('user_id', user.id)
+      .order('first_name', { ascending: true });
+    if (!error) {
+      setClientsForWizard((data || []).map((c:any) => ({ id: c.id, name: `${c.first_name} ${c.last_name}` })));
+    }
+  }, [user]);
+
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
+
+  useEffect(() => {
+    fetchClientsForWizard();
+  }, [fetchClientsForWizard]);
 
   const handleFormSuccess = () => {
     setIsFormOpen(false);

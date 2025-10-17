@@ -27,6 +27,7 @@ import AdminOverviewPage from "./pages/AdminOverviewPage"; // New import
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
+import OrderDetailsPage from "./pages/OrderDetailsPage";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="/clients/:clientId" element={<ClientDetailsPage />} />
               <Route path="/notarizations" element={<NotarizationsPage />} />
               <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
               <Route path="/bank-accounts" element={<BankAccountsPage />} />
               <Route path="/income" element={<IncomePage />} />
               <Route path="/expenses" element={<ExpensesPage />} />
