@@ -15,9 +15,10 @@ import ExpensesPage from "./pages/ExpensesPage";
 import NotaryCredentialsPage from "./pages/NotaryCredentialsPage";
 import PricingPage from "./pages/PricingPage";
 import ManageSubscriptionPage from "./pages/ManageSubscriptionPage";
+import ReportsPage from "./pages/ReportsPage"; // New import
 import Layout from "./components/Layout";
-import LandingPage from "./pages/LandingPage"; // New import
-import RegisterPage from "./pages/RegisterPage"; // New import
+import LandingPage from "./pages/LandingPage";
+import RegisterPage from "./pages/RegisterPage";
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 
@@ -49,10 +50,10 @@ const App = () => (
       <BrowserRouter>
         <SessionContextProvider>
           <Routes>
-            <Route path="/" element={<LandingPage />} /> {/* New landing page as default */}
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<RegisterPage />} /> {/* New registration page */}
-            <Route path="/pricing" element={<PricingPage />} /> {/* Public pricing page */}
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route
               element={
                 <ProtectedRoute>
@@ -60,7 +61,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             >
-              <Route path="/dashboard" element={<Index />} /> {/* Dashboard is now protected */}
+              <Route path="/dashboard" element={<Index />} />
               <Route path="/clients" element={<ClientsPage />} />
               <Route path="/notarizations" element={<NotarizationsPage />} />
               <Route path="/orders" element={<OrdersPage />} />
@@ -70,6 +71,7 @@ const App = () => (
               <Route path="/notary-credentials" element={<NotaryCredentialsPage />} />
               <Route path="/manage-subscription" element={<ManageSubscriptionPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/reports" element={<ReportsPage />} /> {/* New Reports Route */}
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
