@@ -9,6 +9,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { supabase } from '@/integrations/supabase/client';
+import { useSession } from '@/contexts/SessionContext';
+import { showError } from '@/utils/toast';
 
 interface CategoryFilterProps {
   selectedCategory: string | undefined;
