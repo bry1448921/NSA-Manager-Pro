@@ -22,6 +22,7 @@ interface SubscriptionRecord {
   current_period_start: string;
   current_period_end: string;
   created_at: string;
+  cancel_at_period_end: boolean;
   profiles: {
     first_name: string | null;
     last_name: string | null;
@@ -56,6 +57,7 @@ const AdminSalesReportsPage: React.FC = () => {
           current_period_start,
           current_period_end,
           created_at,
+          cancel_at_period_end,
           profiles (first_name, last_name, email)
         `)
         .order('created_at', { ascending: false });
@@ -70,7 +72,10 @@ const AdminSalesReportsPage: React.FC = () => {
       const { data, error } = await query;
 
       if (error) throw error;
-      setSubscriptions(data || []);
+      setSubscriptions(((data || []) as any[]).map((s: any) => {
+        const profiles = Array.isArray(s.profiles) ? (s.profiles[0] ?? null) : s.profiles;
+        return { ...s, profiles } as SubscriptionRecord;
+      }));
     } catch (error: any) {
       console.error('Error fetching sales data:', error.message);
       showError('Failed to fetch sales data.');
@@ -86,7 +91,7 @@ const AdminSalesReportsPage: React.FC = () => {
   }, [currentUser, currentProfile, isSessionLoading, fetchSalesData]);
 
   const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active' || sub.status === 'trialing');
-  const newSubscriptions = subscriptions.filter(sub => sub.status === 'active' || sub.status === 'trialing'); // For simplicity, considering all active/trialing within range as 'new' for this report
+  const newSubscriptions = subscriptions.filter(sub => sub.status === 'active' || sub.status === 'trialing');
   const canceledSubscriptions = subscriptions.filter(sub => sub.status === 'canceled' || sub.cancel_at_period_end);
 
   const handleExportCsv = () => {

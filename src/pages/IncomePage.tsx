@@ -29,7 +29,7 @@ interface Income {
   account_id: string | null;
   amount: number;
   description: string | null;
-  income_date: string; // ISO string from DB
+  income_date: string;
   category: 'notary_fee' | 'reimbursement' | 'other';
   bank_accounts: {
     account_name: string;
@@ -65,7 +65,10 @@ const IncomePage: React.FC = () => {
       console.error('Error fetching income records:', error.message);
       showError('Failed to fetch income records.');
     } else {
-      setIncomeRecords(data || []);
+      setIncomeRecords(((data || []) as any[]).map((r: any) => {
+        const bank_accounts = Array.isArray(r.bank_accounts) ? (r.bank_accounts[0] ?? null) : r.bank_accounts;
+        return { ...r, bank_accounts } as Income;
+      }));
     }
     setLoading(false);
   }, [user]);

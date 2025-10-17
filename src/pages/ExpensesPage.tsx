@@ -29,7 +29,7 @@ interface Expense {
   account_id: string | null;
   amount: number;
   description: string | null;
-  expense_date: string; // ISO string from DB
+  expense_date: string;
   category: 'office_supplies' | 'travel' | 'education' | 'marketing' | 'other';
   bank_accounts: {
     account_name: string;
@@ -65,7 +65,10 @@ const ExpensesPage: React.FC = () => {
       console.error('Error fetching expense records:', error.message);
       showError('Failed to fetch expense records.');
     } else {
-      setExpenseRecords(data || []);
+      setExpenseRecords(((data || []) as any[]).map((r: any) => {
+        const bank_accounts = Array.isArray(r.bank_accounts) ? (r.bank_accounts[0] ?? null) : r.bank_accounts;
+        return { ...r, bank_accounts } as Expense;
+      }));
     }
     setLoading(false);
   }, [user]);

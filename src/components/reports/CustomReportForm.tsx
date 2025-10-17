@@ -15,9 +15,9 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2Icon, DownloadIcon, FileTextIcon, FileDownIcon } from 'lucide-react'; // Added FileDownIcon
+import { Loader2Icon, DownloadIcon, FileTextIcon, FileDownIcon } from 'lucide-react';
 import { exportToCsv } from '@/utils/report-exports';
-import { exportToPdf } from '@/utils/report-pdf-exports'; // New import
+import { exportToPdf } from '@/utils/report-pdf-exports';
 import { format } from 'date-fns';
 
 interface ColumnDefinition {
@@ -105,7 +105,7 @@ const tableSchemas: { [key: string]: ColumnDefinition[] } = {
 
 const CustomReportForm: React.FC = () => {
   const { user } = useSession();
-  const [dataSource, setDataSource] = useState<keyof typeof tableSchemas | ''>('');
+  const [dataSource, setDataSource] = useState<string>('');
   const [availableColumns, setAvailableColumns] = useState<ColumnDefinition[]>([]);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [reportData, setReportData] = useState<any[]>([]);
@@ -115,8 +115,8 @@ const CustomReportForm: React.FC = () => {
   useEffect(() => {
     if (dataSource) {
       setAvailableColumns(tableSchemas[dataSource]);
-      setSelectedColumns([]); // Reset selected columns when data source changes
-      setReportData([]); // Clear previous report data
+      setSelectedColumns([]);
+      setReportData([]);
       setReportGenerated(false);
     } else {
       setAvailableColumns([]);
@@ -147,7 +147,6 @@ const CustomReportForm: React.FC = () => {
     setReportGenerated(false);
 
     try {
-      // Construct the select string for Supabase, handling nested selects for joins
       const selectString = selectedColumns
         .map((colKey) => {
           if (colKey.includes('.')) {
@@ -161,7 +160,7 @@ const CustomReportForm: React.FC = () => {
       const { data, error } = await supabase
         .from(dataSource)
         .select(selectString)
-        .eq('user_id', user.id); // Always filter by user_id for security
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
@@ -198,7 +197,6 @@ const CustomReportForm: React.FC = () => {
           value = row[colKey];
         }
 
-        // Format dates and numbers for CSV
         if (colDef?.type === 'date' && value) {
           newRow[colDef.label] = format(new Date(value), 'yyyy-MM-dd');
         } else if (colDef?.type === 'number' && value !== null && value !== undefined) {
@@ -226,7 +224,7 @@ const CustomReportForm: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col space-y-2">
           <Label htmlFor="data-source">Select Data Source</Label>
-          <Select onValueChange={(value: keyof typeof tableSchemas) => setDataSource(value)} value={dataSource}>
+          <Select onValueChange={(value: string) => setDataSource(value)} value={dataSource}>
             <SelectTrigger id="data-source">
               <SelectValue placeholder="Choose a data source" />
             </SelectTrigger>
@@ -282,7 +280,7 @@ const CustomReportForm: React.FC = () => {
       </div>
 
       {reportGenerated && reportData.length > 0 && (
-        <div id="custom-report-content" className="mt-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm"> {/* Added ID for PDF export */}
+        <div id="custom-report-content" className="mt-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <h3 className="text-xl font-semibold mb-4">Generated Report</h3>
           <div className="overflow-x-auto border rounded-md">
             <Table>

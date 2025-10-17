@@ -27,7 +27,7 @@ import { format } from 'date-fns';
 interface Order {
   id: string;
   client_id: string;
-  order_date: string; // ISO string from DB
+  order_date: string;
   service_type: string;
   status: string;
   total_amount: number | null;
@@ -67,7 +67,10 @@ const OrdersPage: React.FC = () => {
       console.error('Error fetching orders:', error.message);
       showError('Failed to fetch orders.');
     } else {
-      setOrders(data || []);
+      setOrders(((data || []) as any[]).map((o: any) => {
+        const clients = Array.isArray(o.clients) ? (o.clients[0] ?? null) : o.clients;
+        return { ...o, clients } as Order;
+      }));
     }
     setLoading(false);
   }, [user]);

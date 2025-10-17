@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "npm run lint",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
+    "test": "echo \"No tests\" && exit 0",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -87,5 +89,9 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^6.3.4"
+  },
+  "engines": {
+    "node": ">=18 <23",
+    "npm": ">=9 <11"
   }
 }

@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { showError } from '@/utils/toast';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import AccountFilter from '@/components/reports/AccountFilter';
-import CategoryFilter from '@/components/reports/CategoryFilter'; // Corrected to default import
+import CategoryFilter from '@/components/reports/CategoryFilter';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -100,8 +100,14 @@ const IncomeExpenseReport: React.FC = () => {
       if (incomeError) throw incomeError;
       if (expenseError) throw expenseError;
 
-      setIncomeRecords(incomeData || []);
-      setExpenseRecords(expenseData || []);
+      setIncomeRecords(((incomeData || []) as any[]).map((i: any) => {
+        const bank_accounts = Array.isArray(i.bank_accounts) ? (i.bank_accounts[0] ?? null) : i.bank_accounts;
+        return { ...i, bank_accounts } as IncomeRecord;
+      }));
+      setExpenseRecords(((expenseData || []) as any[]).map((e: any) => {
+        const bank_accounts = Array.isArray(e.bank_accounts) ? (e.bank_accounts[0] ?? null) : e.bank_accounts;
+        return { ...e, bank_accounts } as ExpenseRecord;
+      }));
     } catch (error: any) {
       console.error('Error fetching income/expense report data:', error.message);
       showError('Failed to fetch report data.');
@@ -235,7 +241,7 @@ const IncomeExpenseReport: React.FC = () => {
                     </TableRow>
                   ))}
                 </TableBody>
-            </Table>
+              </Table>
             </div>
           )}
 

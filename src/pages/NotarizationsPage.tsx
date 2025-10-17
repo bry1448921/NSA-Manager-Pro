@@ -28,7 +28,7 @@ interface Notarization {
   id: string;
   client_id: string;
   document_type: string;
-  notarization_date: string; // ISO string from DB
+  notarization_date: string;
   status: string;
   notes: string | null;
   clients: {
@@ -65,7 +65,10 @@ const NotarizationsPage: React.FC = () => {
       console.error('Error fetching notarizations:', error.message);
       showError('Failed to fetch notarizations.');
     } else {
-      setNotarizations(data || []);
+      setNotarizations(((data || []) as any[]).map((n: any) => {
+        const clients = Array.isArray(n.clients) ? (n.clients[0] ?? null) : n.clients;
+        return { ...n, clients } as Notarization;
+      }));
     }
     setLoading(false);
   }, [user]);
