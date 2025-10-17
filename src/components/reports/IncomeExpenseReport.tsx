@@ -5,8 +5,8 @@ import { useSession } from '@/contexts/SessionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { showError } from '@/utils/toast';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
-import { AccountFilter } from '@/components/reports/AccountFilter';
-import { CategoryFilter } from '@/components/reports/CategoryFilter'; // New import
+import AccountFilter from '@/components/reports/AccountFilter'; // Corrected import
+import { CategoryFilter } from '@/components/reports/CategoryFilter';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -44,8 +44,8 @@ const IncomeExpenseReport: React.FC = () => {
     to: undefined,
   });
   const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);
-  const [selectedIncomeCategory, setSelectedIncomeCategory] = useState<string | undefined>(undefined); // New state
-  const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<string | undefined>(undefined); // New state
+  const [selectedIncomeCategory, setSelectedIncomeCategory] = useState<string | undefined>(undefined);
+  const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<string | undefined>(undefined);
 
   const fetchReportData = useCallback(async () => {
     if (!user) return;
@@ -87,10 +87,10 @@ const IncomeExpenseReport: React.FC = () => {
         incomeQuery = incomeQuery.eq('account_id', selectedAccountId);
         expenseQuery = expenseQuery.eq('account_id', selectedAccountId);
       }
-      if (selectedIncomeCategory) { // Apply income category filter
+      if (selectedIncomeCategory) {
         incomeQuery = incomeQuery.eq('category', selectedIncomeCategory);
       }
-      if (selectedExpenseCategory) { // Apply expense category filter
+      if (selectedExpenseCategory) {
         expenseQuery = expenseQuery.eq('category', selectedExpenseCategory);
       }
 
@@ -108,7 +108,7 @@ const IncomeExpenseReport: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, dateRange, selectedAccountId, selectedIncomeCategory, selectedExpenseCategory]); // Add new dependencies
+  }, [user, dateRange, selectedAccountId, selectedIncomeCategory, selectedExpenseCategory]);
 
   useEffect(() => {
     fetchReportData();
@@ -123,7 +123,7 @@ const IncomeExpenseReport: React.FC = () => {
       { Type: 'Total Income', Amount: totalIncome.toFixed(2), Description: '', Date: '', Category: '', Account: '' },
       { Type: 'Total Expenses', Amount: totalExpenses.toFixed(2), Description: '', Date: '', Category: '', Account: '' },
       { Type: 'Net Profit', Amount: netProfit.toFixed(2), Description: '', Date: '', Category: '', Account: '' },
-      {}, // Empty row for separation
+      {},
       { Type: 'Income Details', Amount: '', Description: '', Date: '', Category: '', Account: '' },
       ...incomeRecords.map(i => ({
         Type: 'Income',
@@ -133,7 +133,7 @@ const IncomeExpenseReport: React.FC = () => {
         Category: i.category.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()),
         Account: i.bank_accounts ? `${i.bank_accounts.account_name} (${i.bank_accounts.bank_name})` : '-',
       })),
-      {}, // Empty row for separation
+      {},
       { Type: 'Expense Details', Amount: '', Description: '', Date: '', Category: '', Account: '' },
       ...expenseRecords.map(e => ({
         Type: 'Expense',
@@ -158,8 +158,8 @@ const IncomeExpenseReport: React.FC = () => {
       <div className="flex flex-wrap gap-4 items-end">
         <DateRangePicker date={dateRange} setDate={setDateRange} />
         <AccountFilter selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} />
-        <CategoryFilter type="income" selectedCategory={selectedIncomeCategory} onSelectCategory={setSelectedIncomeCategory} /> {/* New Income Category Filter */}
-        <CategoryFilter type="expense" selectedCategory={selectedExpenseCategory} onSelectCategory={setSelectedExpenseCategory} /> {/* New Expense Category Filter */}
+        <CategoryFilter type="income" selectedCategory={selectedIncomeCategory} onSelectCategory={setSelectedIncomeCategory} />
+        <CategoryFilter type="expense" selectedCategory={selectedExpenseCategory} onSelectCategory={setSelectedExpenseCategory} />
         <Button onClick={handleExportCsv} disabled={loading}>
           <DownloadIcon className="mr-2 h-4 w-4" /> Export CSV
         </Button>
