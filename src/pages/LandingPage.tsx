@@ -33,7 +33,7 @@ const LandingPage: React.FC = () => {
             Focus on your work, we'll handle the organization.
           </p>
           <Button asChild size="lg" className="text-lg px-8 py-6">
-            <Link to="/register">Get Started Free</Link>
+            <Link to="/pricing">Choose Your Plan</Link>
           </Button>
         </div>
       </section>
@@ -91,7 +91,7 @@ const LandingPage: React.FC = () => {
             Join thousands of notaries who are simplifying their daily operations.
           </p>
           <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-6">
-            <Link to="/register">Start Your Free Trial Today</Link>
+            <Link to="/pricing">View Our Plans</Link>
           </Button>
         </div>
       </section>
