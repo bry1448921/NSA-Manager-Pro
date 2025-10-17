@@ -21,8 +21,9 @@ import LandingPage from "./pages/LandingPage";
 import RegisterPage from "./pages/RegisterPage";
 import ClientDetailsPage from "./pages/ClientDetailsPage";
 import UserManagementPage from "./pages/UserManagementPage";
-import AdminDashboardPage from "./pages/AdminDashboardPage"; // New import
-import AdminProtectedRoute from "./components/AdminProtectedRoute"; // New import
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import AdminSalesReportsPage from "./pages/AdminSalesReportsPage"; // New import
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
 
@@ -85,7 +86,15 @@ const App = () => (
                     <AdminDashboardPage />
                   </AdminProtectedRoute>
                 }
-              /> {/* New Admin Dashboard Route */}
+              />
+              <Route
+                path="/admin-sales-reports"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminSalesReportsPage />
+                  </AdminProtectedRoute>
+                }
+              /> {/* New Admin Sales Reports Route */}
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

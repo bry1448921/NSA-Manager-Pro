@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { MenuIcon, UsersIcon, FileTextIcon, LayoutDashboardIcon, UserIcon, LogOutIcon, BanknoteIcon, DollarSignIcon, ReceiptTextIcon, StampIcon, CreditCardIcon, BarChart3Icon, UserPlusIcon, ShieldCheckIcon } from 'lucide-react'; // Added ShieldCheckIcon for Admin Dashboard
+import { MenuIcon, UsersIcon, FileTextIcon, LayoutDashboardIcon, UserIcon, LogOutIcon, BanknoteIcon, DollarSignIcon, ReceiptTextIcon, StampIcon, CreditCardIcon, BarChart3Icon, UserPlusIcon, ShieldCheckIcon, LineChartIcon } from 'lucide-react'; // Added LineChartIcon for Admin Sales Reports
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSession } from '@/contexts/SessionContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,7 +29,7 @@ const NavLink: React.FC<NavLinkProps> = ({ to, icon, label, onClick }) => (
 const MainSidebar: React.FC = () => {
   const isMobile = useIsMobile();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { user, profile, isLoading: isSessionLoading } = useSession(); // Get profile from session
+  const { user, profile, isLoading: isSessionLoading } = useSession();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -58,8 +58,11 @@ const MainSidebar: React.FC = () => {
         <NavLink to="/notary-credentials" icon={<StampIcon className="h-5 w-5" />} label="Notary Credentials" onClick={closeSheet} />
         <NavLink to="/reports" icon={<BarChart3Icon className="h-5 w-5" />} label="Reports" onClick={closeSheet} />
         <NavLink to="/user-management" icon={<UserPlusIcon className="h-5 w-5" />} label="User Management" onClick={closeSheet} />
-        {profile?.role === 'admin' && ( // Conditionally render Admin Dashboard link
-          <NavLink to="/admin-dashboard" icon={<ShieldCheckIcon className="h-5 w-5" />} label="Admin Dashboard" onClick={closeSheet} />
+        {profile?.role === 'admin' && (
+          <>
+            <NavLink to="/admin-dashboard" icon={<ShieldCheckIcon className="h-5 w-5" />} label="Admin Dashboard" onClick={closeSheet} />
+            <NavLink to="/admin-sales-reports" icon={<LineChartIcon className="h-5 w-5" />} label="Admin Sales Reports" onClick={closeSheet} /> {/* New Admin Sales Reports Link */}
+          </>
         )}
         <NavLink to="/pricing" icon={<CreditCardIcon className="h-5 w-5" />} label="Pricing" onClick={closeSheet} />
         <NavLink to="/manage-subscription" icon={<CreditCardIcon className="h-5 w-5" />} label="Manage Subscription" onClick={closeSheet} />
