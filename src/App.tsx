@@ -9,9 +9,10 @@ import ClientsPage from "./pages/ClientsPage";
 import NotarizationsPage from "./pages/NotarizationsPage";
 import ProfilePage from "./pages/ProfilePage";
 import OrdersPage from "./pages/OrdersPage";
-import BankAccountsPage from "./pages/BankAccountsPage"; // New import
-import IncomePage from "./pages/IncomePage"; // New import
-import ExpensesPage from "./pages/ExpensesPage"; // New import
+import BankAccountsPage from "./pages/BankAccountsPage";
+import IncomePage from "./pages/IncomePage";
+import ExpensesPage from "./pages/ExpensesPage";
+import NotaryCredentialsPage from "./pages/NotaryCredentialsPage"; // New import
 import Layout from "./components/Layout";
 import { SessionContextProvider, useSession } from "./contexts/SessionContext";
 import React from "react";
@@ -56,9 +57,10 @@ const App = () => (
               <Route path="/clients" element={<ClientsPage />} />
               <Route path="/notarizations" element={<NotarizationsPage />} />
               <Route path="/orders" element={<OrdersPage />} />
-              <Route path="/bank-accounts" element={<BankAccountsPage />} /> {/* New route */}
-              <Route path="/income" element={<IncomePage />} /> {/* New route */}
-              <Route path="/expenses" element={<ExpensesPage />} /> {/* New route */}
+              <Route path="/bank-accounts" element={<BankAccountsPage />} />
+              <Route path="/income" element={<IncomePage />} />
+              <Route path="/expenses" element={<ExpensesPage />} />
+              <Route path="/notary-credentials" element={<NotaryCredentialsPage />} /> {/* New route */}
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
