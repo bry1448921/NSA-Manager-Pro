@@ -4,6 +4,11 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
   build: {
     // increase if you accept larger single files, or reduce after improving splitting
     chunkSizeWarningLimit: 1500, // kB
