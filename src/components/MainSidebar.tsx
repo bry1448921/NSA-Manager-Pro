@@ -45,14 +45,13 @@ const MainSidebar: React.FC = () => {
   }
 
   const sidebarContent = (
-    <div className="flex flex-col h-full p-4">
-      <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">NSA Manager Pro</h2>
-      <nav className="flex flex-col space-y-2 flex-grow">
+    <div className="flex flex-col h-full p-4 bg-blue-600 text-white">
+      <h2 className="text-2xl font-bold mb-6 truncate">NSA Manager Pro</h2>
+      <nav className="flex flex-col space-y-2 flex-grow overflow-hidden">
         <NavLink to="/dashboard" icon={<LayoutDashboardIcon className="h-5 w-5" />} label="Dashboard" onClick={closeSheet} />
         <NavLink to="/clients" icon={<UsersIcon className="h-5 w-5" />} label="Clients" onClick={closeSheet} />
         <NavLink to="/notarizations" icon={<FileTextIcon className="h-5 w-5" />} label="Notarizations" onClick={closeSheet} />
         <NavLink to="/orders" icon={<LayoutDashboardIcon className="h-5 w-5" />} label="Orders" onClick={closeSheet} />
-        <NavLink to="/bank-accounts" icon={<BanknoteIcon className="h-5 w-5" />} label="Bank Accounts" onClick={closeSheet} />
         <NavLink to="/finances" icon={<DollarSignIcon className="h-5 w-5" />} label="Finances" onClick={closeSheet} />
         <NavLink to="/notary-credentials" icon={<StampIcon className="h-5 w-5" />} label="Notary Credentials" onClick={closeSheet} />
         <NavLink to="/reports" icon={<BarChart3Icon className="h-5 w-5" />} label="Reports" onClick={closeSheet} />
@@ -66,9 +65,9 @@ const MainSidebar: React.FC = () => {
         <NavLink to="/manage-subscription" icon={<CreditCardIcon className="h-5 w-5" />} label="Manage Subscription" onClick={closeSheet} />
         <NavLink to="/profile" icon={<UserIcon className="h-5 w-5" />} label="Profile" onClick={closeSheet} />
       </nav>
-      <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="mt-auto pt-4 border-t border-blue-400">
         {user && (
-          <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          <div className="mb-4 text-sm truncate">
             Logged in as: <span className="font-medium">{user.email}</span>
           </div>
         )}
@@ -96,7 +95,7 @@ const MainSidebar: React.FC = () => {
   }
 
   return (
-    <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-screen sticky top-0">
+    <aside className="w-64 bg-blue-600 text-white h-screen sticky top-0">
       {sidebarContent}
     </aside>
   );
