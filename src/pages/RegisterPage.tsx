@@ -104,10 +104,11 @@ const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
-  const [accountCreated, setAccountCreated] = useState(false);
+  const [accountCreated, setAccountCreated] = useState(false); // now means "form completed"
   const [selectedPriceId, setSelectedPriceId] = useState<string | null>(null);
   const [agreeDisclosure, setAgreeDisclosure] = useState(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  const [registrationData, setRegistrationData] = useState<RegisterFormValues | null>(null);
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -128,39 +129,30 @@ const RegisterPage: React.FC = () => {
   const onRegisterNext = async (values: RegisterFormValues) => {
     setIsSubmitting(true);
     try {
-      // Combine split billing fields into a single string for Supabase metadata/profile trigger
+      // Combine split billing fields into a single string for metadata
       const combinedBillingAddress = `${values.billing_street}, ${values.billing_city}, ${values.billing_state} ${values.billing_zip}`;
 
-      const { data, error } = await supabase.auth.signUp({
-        email: values.email,
-        password: values.password,
-        options: {
-          data: {
-            first_name: values.first_name,
-            last_name: values.last_name,
-            company: values.company,
-            phone_number: values.phone_number,
-            billing_address: combinedBillingAddress,
-          },
-        },
-      });
+      // Do NOT create Supabase account yet; proceed to checkout step with collected info
+      const prepared: RegisterFormValues = {
+        ...values,
+        billing_street: values.billing_street,
+        billing_city: values.billing_city,
+        billing_state: values.billing_state,
+        billing_zip: values.billing_zip,
+      };
 
-      if (error) throw error;
+      setRegistrationData(prepared);
+      // Store email/password in localStorage for auto-login after payment
+      window.localStorage.setItem('signup_email', values.email);
+      window.localStorage.setItem('signup_password', values.password);
+      window.localStorage.setItem('signup_billing_address', combinedBillingAddress);
 
-      if (data.user && data.session) {
-        showSuccess('Account created! Choose a plan to get started.');
-        setAccountCreated(true);
-        setStep(2);
-      } else if (data.user && !data.session) {
-        showSuccess('Account created! Please confirm your email, then return to subscribe.');
-        setAccountCreated(true);
-        setStep(2);
-      } else {
-        showError('Unexpected registration state. Please try again.');
-      }
+      showSuccess('Info saved! Choose a plan to continue.');
+      setAccountCreated(true);
+      setStep(2);
     } catch (error: any) {
-      console.error('Registration error:', error.message);
-      showError(`Registration failed: ${error.message}`);
+      console.error('Registration preparation error:', error.message);
+      showError(`Could not proceed: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -175,30 +167,39 @@ const RegisterPage: React.FC = () => {
       showError("You must agree to the recurring charge authorization.");
       return;
     }
+    if (!registrationData) {
+      showError("Please complete Step 1 first.");
+      return;
+    }
 
     setIsCheckoutLoading(true);
     try {
-      // Ensure user is authenticated so the function receives an Authorization header
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData?.session?.access_token;
-      if (!accessToken) {
-        showError("Please log in (or confirm your email) before subscribing.");
-        setIsCheckoutLoading(false);
-        return;
-      }
+      const combinedBillingAddress = window.localStorage.getItem('signup_billing_address') || 
+        `${registrationData.billing_street}, ${registrationData.billing_city}, ${registrationData.billing_state} ${registrationData.billing_zip}`;
 
-      const successUrl = `${window.location.origin}/dashboard`;
+      const successUrl = `${window.location.origin}/checkout-success`;
       const cancelUrl = `${window.location.origin}/register`;
 
+      // Invoke edge function WITHOUT requiring a Supabase session
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        body: { price_id: selectedPriceId, success_url: successUrl, cancel_url: cancelUrl },
+        body: {
+          price_id: selectedPriceId,
+          email: registrationData.email,
+          first_name: registrationData.first_name,
+          last_name: registrationData.last_name,
+          company: registrationData.company || '',
+          phone_number: registrationData.phone_number || '',
+          billing_address: combinedBillingAddress,
+          password: registrationData.password,
+          success_url: successUrl,
+          cancel_url: cancelUrl,
+        },
       });
 
       if (error) throw error;
 
-      if (data && data.url) {
-        window.location.href = data.url;
+      if (data && (data as any).url) {
+        window.location.href = (data as any).url;
       } else {
         showError("Failed to start checkout.");
       }
@@ -384,7 +385,7 @@ const RegisterPage: React.FC = () => {
           <>
             {!accountCreated && (
               <div className="mb-4 text-sm text-red-600">
-                Please create your account first (Step 1). If you just registered, check your email to confirm before subscribing.
+                Please complete Step 1 first. Your account will be created after payment succeeds.
               </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

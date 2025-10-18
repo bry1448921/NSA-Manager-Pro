@@ -1,5 +1,5 @@
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import Stripe from "https://esm.sh/stripe@16.2.0?target=deno";
 
 const corsHeaders = {
@@ -17,69 +17,59 @@ serve(async (req) => {
     httpClient: Stripe.createFetchHttpClient(),
   });
 
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-  }
-
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-  const supabaseUser = createClient(supabaseUrl, anonKey, {
-    global: { headers: { Authorization: authHeader } },
-  });
-  const supabaseAdmin = createClient(supabaseUrl, serviceKey);
-
   try {
-    const { data: userRes } = await supabaseUser.auth.getUser();
-    const user = userRes?.user;
-    if (!user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
     const body = await req.json();
     const priceId = body?.price_id as string | undefined;
-    const successUrl = (body?.success_url as string | undefined) ?? "http://localhost:5173/dashboard";
+    // Registration info passed from the client (no account yet)
+    const email = body?.email as string | undefined;
+    const first_name = body?.first_name as string | undefined;
+    const last_name = body?.last_name as string | undefined;
+    const company = body?.company as string | undefined;
+    const phone_number = body?.phone_number as string | undefined;
+    const billing_address = body?.billing_address as string | undefined;
+    const password = body?.password as string | undefined;
+
+    const successUrl = (body?.success_url as string | undefined) ?? "http://localhost:5173/checkout-success";
     const cancelUrl = (body?.cancel_url as string | undefined) ?? "http://localhost:5173/register";
 
     if (!priceId) {
       return new Response(JSON.stringify({ error: "Missing price_id" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
-
-    // Ensure we have a Stripe customer
-    const { data: customerRow } = await supabaseAdmin
-      .from("customers")
-      .select("stripe_customer_id")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    let stripeCustomerId = customerRow?.stripe_customer_id as string | undefined;
-
-    if (!stripeCustomerId) {
-      const customer = await stripe.customers.create({
-        email: user.email ?? undefined,
-        metadata: { supabase_user_id: user.id },
-      });
-
-      // Save mapping
-      await supabaseAdmin
-        .from("customers")
-        .upsert({ id: user.id, stripe_customer_id: customer.id }, { onConflict: "id" });
-
-      stripeCustomerId = customer.id;
+    if (!email || !first_name || !last_name || !password || !billing_address) {
+      return new Response(JSON.stringify({ error: "Missing registration fields (email, first_name, last_name, password, billing_address)." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+
+    // Create a Stripe customer using the provided email
+    const customer = await stripe.customers.create({
+      email,
+      metadata: {
+        supabase_user_email: email,
+        first_name,
+        last_name,
+        company: company ?? "",
+        phone_number: phone_number ?? "",
+        billing_address,
+        password, // used by webhook to create the Supabase account
+      },
+    });
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      customer: stripeCustomerId,
+      customer: customer.id,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl,
       cancel_url: cancelUrl,
       payment_method_types: ["card"],
       allow_promotion_codes: true,
+      // replicate metadata on the session as well
       metadata: {
-        supabase_user_id: user.id,
+        supabase_user_email: email,
+        first_name,
+        last_name,
+        company: company ?? "",
+        phone_number: phone_number ?? "",
+        billing_address,
+        password,
       },
     });
 

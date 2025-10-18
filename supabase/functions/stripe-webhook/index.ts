@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import Stripe from 'https://esm.sh/stripe@16.2.0?target=deno';
@@ -40,27 +41,55 @@ serve(async (req) => {
 
   try {
     switch (event.type) {
-      case 'checkout.session.completed':
+      case 'checkout.session.completed': {
         const checkoutSession = event.data.object as Stripe.Checkout.Session;
         const subscriptionId = checkoutSession.subscription as string;
         const customerId = checkoutSession.customer as string;
-        const userId = checkoutSession.metadata?.supabase_user_id;
 
-        if (!userId || !subscriptionId || !customerId) {
-          throw new Error('Missing metadata or IDs in checkout session.');
+        // Registration metadata collected pre-checkout
+        const email = (checkoutSession.metadata?.supabase_user_email || checkoutSession.customer_details?.email) as string | undefined;
+        const first_name = checkoutSession.metadata?.first_name as string | undefined;
+        const last_name = checkoutSession.metadata?.last_name as string | undefined;
+        const company = checkoutSession.metadata?.company as string | undefined;
+        const phone_number = checkoutSession.metadata?.phone_number as string | undefined;
+        const billing_address = checkoutSession.metadata?.billing_address as string | undefined;
+        const password = checkoutSession.metadata?.password as string | undefined;
+
+        if (!email || !subscriptionId || !customerId || !first_name || !last_name || !password) {
+          throw new Error('Missing required registration metadata or IDs in checkout session.');
         }
 
-        // Update customer table with Stripe customer ID
+        // 1) Create Supabase auth user (no email confirmation). Trigger will insert profile.
+        const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: {
+            first_name,
+            last_name,
+            company,
+            phone_number,
+            billing_address,
+          },
+        });
+
+        if (createError || !created?.user?.id) {
+          throw new Error(createError?.message || 'Failed to create Supabase user after checkout.');
+        }
+
+        const userId = created.user.id;
+
+        // 2) Update customer table with Stripe customer ID
         await supabaseAdmin
           .from('customers')
           .upsert({ id: userId, stripe_customer_id: customerId }, { onConflict: 'id' });
 
-        // Fetch subscription details from Stripe
+        // 3) Fetch subscription details from Stripe
         const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId, {
           expand: ['default_payment_method', 'plan.product'],
         });
 
-        // Insert or update subscription in our DB
+        // 4) Insert or update subscription in our DB
         await supabaseAdmin.from('subscriptions').upsert(
           {
             user_id: userId,
@@ -74,9 +103,10 @@ serve(async (req) => {
           { onConflict: 'stripe_subscription_id' }
         );
         break;
+      }
 
       case 'customer.subscription.updated':
-      case 'customer.subscription.deleted':
+      case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         const { data: existingSubscription } = await supabaseAdmin
           .from('subscriptions')
@@ -99,6 +129,7 @@ serve(async (req) => {
           );
         }
         break;
+      }
 
       default:
         console.warn(`Unhandled event type: ${event.type}`);
@@ -109,8 +140,8 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
-    console.error('Webhook handler error:', error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error('Webhook handler error:', (error as any)?.message);
+    return new Response(JSON.stringify({ error: (error as any)?.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });

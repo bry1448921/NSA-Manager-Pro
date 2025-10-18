@@ -33,6 +33,7 @@ import React from "react";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 import { useSubscription } from "./hooks/use-subscription";
 import FinancesPage from "./pages/FinancesPage";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/checkout-success" element={<CheckoutSuccess />} />
             <Route
               element={
                 <ProtectedRoute>
