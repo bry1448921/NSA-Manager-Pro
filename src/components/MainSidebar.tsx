@@ -18,10 +18,10 @@ interface NavLinkProps {
 }
 
 const NavLink: React.FC<NavLinkProps> = ({ to, icon, label, onClick }) => (
-  <Button variant="ghost" className="w-full justify-start text-lg h-12" asChild onClick={onClick}>
-    <Link to={to} className="flex items-center space-x-3">
-      {icon}
-      <span>{label}</span>
+  <Button variant="ghost" className="w-full justify-start text-lg h-12 text-white hover:bg-blue-700 truncate" asChild onClick={onClick}>
+    <Link to={to} className="flex items-center space-x-3 min-w-0">
+      <span className="flex-shrink-0">{icon}</span>
+      <span className="truncate">{label}</span>
     </Link>
   </Button>
 );
