@@ -178,10 +178,20 @@ const RegisterPage: React.FC = () => {
 
     setIsCheckoutLoading(true);
     try {
+      // Ensure user is authenticated so the function receives an Authorization header
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) {
+        showError("Please log in (or confirm your email) before subscribing.");
+        setIsCheckoutLoading(false);
+        return;
+      }
+
       const successUrl = `${window.location.origin}/dashboard`;
       const cancelUrl = `${window.location.origin}/register`;
 
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        headers: { Authorization: `Bearer ${accessToken}` },
         body: { price_id: selectedPriceId, success_url: successUrl, cancel_url: cancelUrl },
       });
 

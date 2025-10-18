@@ -86,8 +86,20 @@ const PricingPage: React.FC = () => {
 
     setLoadingPriceId(priceId);
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) {
+        showError("Please log in again to continue.");
+        setLoadingPriceId(null);
+        return;
+      }
+
+      const successUrl = `${window.location.origin}/dashboard`;
+      const cancelUrl = `${window.location.origin}/pricing`;
+
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: { price_id: priceId },
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: { price_id: priceId, success_url: successUrl, cancel_url: cancelUrl },
       });
 
       if (error) throw error;
