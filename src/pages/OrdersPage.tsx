@@ -25,6 +25,7 @@ import { PencilIcon, Trash2Icon, PlusCircleIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import OrderWizard from '@/components/orders/OrderWizard';
 
 interface Order {
   id: string;
@@ -62,8 +63,7 @@ const OrdersPage: React.FC = () => {
         status,
         total_amount,
         notes,
-        client_id,
-        clients (first_name, last_name)
+        client_id
       `)
       .eq('user_id', user.id)
       .order('order_date', { ascending: false });
@@ -72,10 +72,7 @@ const OrdersPage: React.FC = () => {
       console.error('Error fetching orders:', error.message);
       showError('Failed to fetch orders.');
     } else {
-      setOrders(((data || []) as any[]).map((o: any) => {
-        const clients = Array.isArray(o.clients) ? (o.clients[0] ?? null) : o.clients;
-        return { ...o, clients } as Order;
-      }));
+      setOrders((data || []) as Order[]);
     }
     setLoading(false);
   }, [user]);
@@ -218,11 +215,15 @@ const OrdersPage: React.FC = () => {
                 <PlusCircleIcon className="mr-2 h-4 w-4" /> Add Order
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[600px]">
               <DialogHeader>
-                <DialogTitle>{editingOrder ? 'Edit Order' : 'Add New Order'}</DialogTitle>
+                <DialogTitle>{editingOrder ? 'Edit Order' : 'Add New Order (Wizard)'}</DialogTitle>
               </DialogHeader>
-              <OrderForm onSuccess={handleFormSuccess} initialData={editingOrder} />
+              {editingOrder ? (
+                <OrderForm onSuccess={handleFormSuccess} initialData={editingOrder} />
+              ) : (
+                <OrderWizard onSuccess={handleFormSuccess} clientOptions={clientsForWizard} />
+              )}
             </DialogContent>
           </Dialog>
         </div>
@@ -251,7 +252,7 @@ const OrdersPage: React.FC = () => {
                     className="cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-950/30"
                   >
                     <TableCell className="font-medium">
-                      {order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'N/A'}
+                      {clientsForWizard.find((c) => c.id === order.client_id)?.name || 'N/A'}
                     </TableCell>
                     <TableCell>{order.service_type}</TableCell>
                     <TableCell>{format(new Date(order.order_date), 'PPP')}</TableCell>
